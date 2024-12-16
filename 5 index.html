@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escolha de Números - Pega de Boi</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background-color: #f4f4f4; }
+        input, button { padding: 5px; margin: 5px 0; }
+        button { cursor: pointer; border: none; color: white; font-weight: bold; }
+        .pago { color: green; font-weight: bold; }
+        #listaWhatsApp { width: 100%; margin-top: 10px; }
+        #listaWhatsApp textarea { width: 100%; height: 200px; }
+        /* Botões */
+        .registrar-btn { background-color: #007bff; }
+        .registrar-btn:hover { background-color: #0056b3; }
+
+        .pago-btn { background-color: #28a745; }
+        .pago-btn:hover { background-color: #218838; }
+
+        .editar-btn { background-color: #ffc107; }
+        .editar-btn:hover { background-color: #e0a800; }
+
+        .disponibilizar-btn { background-color: #dc3545; }
+        .disponibilizar-btn:hover { background-color: #c82333; }
+
+        .gerar-btn { background-color: #17a2b8; }
+        .gerar-btn:hover { background-color: #138496; }
+
+        .limpar-btn { background-color: #6c757d; }
+        .limpar-btn:hover { background-color: #5a6268; }
+
+        .disponibilizar-todo-btn { background-color: #007bff; }
+        .disponibilizar-todo-btn:hover { background-color: #0056b3; }
+
+        .reverter-btn { background-color: #fd7e14; }
+        .reverter-btn:hover { background-color: #e65c10; }
+    </style>
+</head>
+<body>
+    <h1>Escolha de Números - Pega de Boi</h1>
+    <h3>Cada número vale por um boi. Escolha seu número e registre seu nome!</h3>
+
+    <!-- Botões de disponibilizar e reverter -->
+    <button class="disponibilizar-todo-btn" onclick="disponibilizarTodos()">Disponibilizar Todos os Números</button>
+    <button class="reverter-btn" onclick="reverterDisponibilizacao()">Reverter Disponibilização</button>
+
+    <label for="quantidade">Quantidade de Números:</label>
+    <input type="number" id="quantidade" min="1" max="500" value="200" onchange="atualizarQuantidade()">
+    <br>
+
+    <label for="numero">Número (1 a <span id="maxNumero">200</span>):</label>
+    <input type="number" id="numero" min="1" placeholder="Digite o número">
+    <label for="nome">Seu Nome:</label>
+    <input type="text" id="nome" placeholder="Digite seu nome">
+    <button class="registrar-btn" onclick="registrar()">Registrar</button>
+
+    <h2>Verificar Disponibilidade de Número</h2>
+    <label for="verificarNumero">Escolha um número para verificar:</label>
+    <input type="number" id="verificarNumero" min="1" placeholder="Digite o número">
+    <button class="gerar-btn" onclick="verificarDisponibilidade()">Verificar Disponibilidade</button>
+    <p id="statusNumero"></p>
+
+    <h2>Lista de Números Escolhidos</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Número</th>
+                <th>Nome</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="tabela">
+            <!-- Os números serão preenchidos aqui -->
+        </tbody>
+    </table>
+
+    <button class="gerar-btn" onclick="gerarLista()">Gerar Lista para WhatsApp</button>
+    <textarea id="listaWhatsApp" rows="10" cols="50" placeholder="Lista gerada aparecerá aqui..." readonly></textarea>
+    <button class="limpar-btn" onclick="limparLista()">Limpar Lista</button>
+
+    <script>
+        let maxNumeros = 200;  // Valor padrão
+        let numeros = JSON.parse(localStorage.getItem('numeros')) || 
+            Array.from({ length: maxNumeros }, (_, i) => ({ numero: i + 1, nome: '', pago: false }));
+        
+        // Backup para reverter a ação de disponibilizar todos os números
+        let backupNumeros = JSON.parse(localStorage.getItem('backupNumeros')) || [...numeros];
+
+        function atualizarQuantidade() {
+            maxNumeros = parseInt(document.getElementById('quantidade').value);
+            document.getElementById('maxNumero').textContent = maxNumeros;
+            // Atualiza os números de acordo com a nova quantidade
+            if (numeros.length > maxNumeros) {
+                numeros.length = maxNumeros;  // Reduz a lista se o número máximo for menor
+            } else {
+                while (numeros.length < maxNumeros) {
+                    numeros.push({ numero: numeros.length + 1, nome: '', pago: false });
+                }
+            }
+            atualizarTabela();
+        }
+
+        function atualizarTabela() {
+            const tabela = document.getElementById('tabela');
+            tabela.innerHTML = ''; // Limpa a tabela
+            numeros.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.numero}</td>
+                    <td>${item.nome || 'Disponível'}</td>
+                    <td class="${item.pago ? 'pago' : ''}">${item.pago ? 'Pago' : (item.nome ? 'Pendente' : 'Disponível')}</td>
+                    <td>
+                        ${item.nome ? ` 
+                            <button class="pago-btn" onclick="marcarPago(${item.numero})">${item.pago ? 'Cancelar Pago' : 'Marcar Pago'}</button>
+                            <button class="editar-btn" onclick="editar(${item.numero})">Editar</button>
+                            <button class="disponibilizar-btn" onclick="disponibilizar(${item.numero})">Disponibilizar</button>
+                        ` : ''}
+                    </td>
+                `;
+                tabela.appendChild(row);
+            });
+
+            // Salva os dados atualizados no Local Storage
+            localStorage.setItem('numeros', JSON.stringify(numeros));
+        }
+
+        function registrar() {
+            const numero = parseInt(document.getElementById('numero').value);
+            const nome = document.getElementById('nome').value.trim();
+
+            if (!numero || numero < 1 || numero > maxNumeros) {
+                alert(`Por favor, escolha um número válido entre 1 e ${maxNumeros}.`);
+                return;
+            }
+            if (!nome) {
+                alert('Por favor, insira seu nome.');
+                return;
+            }
+
+            const index = numeros.findIndex(item => item.numero === numero);
+            if (numeros[index].nome) {
+                alert('Esse número já foi escolhido. Por favor, escolha outro.');
+                return;
+            }
+
+            numeros[index].nome = nome;
+            atualizarTabela();
+
+            document.getElementById('numero').value = '';
+            document.getElementById('nome').value = '';
+        }
+
+        function marcarPago(numero) {
+            const index = numeros.findIndex(item => item.numero === numero);
+            if (index >= 0) {
+                numeros[index].pago = !numeros[index].pago;
+                atualizarTabela();
+            }
+        }
+
+        function editar(numero) {
+            const index = numeros.findIndex(item => item.numero === numero);
+            if (index >= 0) {
+                const novoNome = prompt('Digite o novo nome:', numeros[index].nome);
+                if (novoNome !== null) {
+                    numeros[index].nome = novoNome.trim();
+                    atualizarTabela();
+                }
+            }
+        }
+
+        function disponibilizar(numero) {
+            const index = numeros.findIndex(item => item.numero === numero);
+            if (index >= 0) {
+                numeros[index].nome = '';
+                numeros[index].pago = false;
+                atualizarTabela();
+            }
+        }
+
+        // Função para disponibilizar todos os números
+        function disponibilizarTodos() {
+            if (confirm('Tem certeza que deseja disponibilizar todos os números novamente?')) {
+                // Backup do estado atual antes de alterar
+                backupNumeros = JSON.parse(localStorage.getItem('numeros')) || [...numeros];
+                // Resetando todos os números para "disponível"
+                numeros.forEach(item => {
+                    item.nome = '';
+                    item.pago = false;
+                });
+                atualizarTabela();
+                // Salva o backup
+                localStorage.setItem('backupNumeros', JSON.stringify(backupNumeros));
+            }
+        }
+
+        // Função para reverter a disponibilização
+        function reverterDisponibilizacao() {
+            if (confirm('Tem certeza que deseja reverter a disponibilização de todos os números?')) {
+                numeros = [...backupNumeros];  // Restaura o backup
+                atualizarTabela();
+            }
+        }
+
+        function verificarDisponibilidade() {
+            const numero = parseInt(document.getElementById('verificarNumero').value);
+            const statusElement = document.getElementById('statusNumero');
+
+            if (numero < 1 || numero > maxNumeros) {
+                statusElement.textContent = `Por favor, insira um número válido entre 1 e ${maxNumeros}.`;
+                return;
+            }
+
+            const index = numeros.findIndex(item => item.numero === numero);
+            if (index >= 0) {
+                statusElement.textContent = numeros[index].nome
+                    ? `Número ${numero} já foi escolhido por ${numeros[index].nome}.`
+                    : `Número ${numero} está disponível.`;
+            }
+        }
+
+        function gerarLista() {
+            const lista = numeros.filter(item => item.nome).map(item => `${item.numero} - ${item.nome}`).join('\n');
+            document.getElementById('listaWhatsApp').value = lista;
+        }
+
+        function limparLista() {
+            if (confirm('Tem certeza que deseja limpar a lista?')) {
+                localStorage.removeItem('numeros');
+                atualizarTabela();
+            }
+        }
+
+        // Inicializa a tabela ao carregar a página
+        atualizarTabela();
+    </script>
+</body>
+</html>
