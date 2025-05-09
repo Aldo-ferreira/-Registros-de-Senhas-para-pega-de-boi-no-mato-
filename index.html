@@ -109,10 +109,6 @@
             padding: 10px;
             margin-top: 20px;
         }
-
-        .icone {
-            margin-right: 10px;
-        }
     </style>
 </head>
 <body>
@@ -122,16 +118,26 @@
     </header>
 
     <div class="container">
-        <h2>Adicionar Números e Nomes</h2>
+        <h2>Gerar Lista de Números</h2>
         <input type="number" id="inputNumero" placeholder="Número Inicial" />
         <input type="number" id="quantidade" placeholder="Quantidade" />
-        <input type="text" id="inputNome" placeholder="Nome" />
-        <button class="botao-azul" onclick="gerarNumeros()">Gerar Números</button>
+        <button class="botao-azul" onclick="gerarNumeros()">Gerar Lista Numérica</button>
+
+        <div id="formularioNome" style="display: none;">
+            <h3>Adicionar Nomes aos Números</h3>
+            <input type="text" id="inputNome" placeholder="Nome" />
+            <button class="botao-verde" onclick="adicionarNome()">Adicionar Nome</button>
+        </div>
 
         <h3>Lista de Números e Nomes</h3>
         <ul class="num-list" id="listaNumeros">
             <!-- Números e Nomes serão listados aqui -->
         </ul>
+
+        <h3>Ações</h3>
+        <button class="botao-azul" onclick="removerTodos()">Remover Todos os Nomes</button>
+        <button class="botao-verde" onclick="verificarPreenchido()">Verificar Se Está Preenchido</button>
+        <button class="botao-azul" onclick="verificarAberto()">Verificar Se Está Aberto</button>
     </div>
 
     <footer>
@@ -140,26 +146,57 @@
 
     <script>
         const listaNumeros = [];
+        let numeroAtual = 0;
 
         function gerarNumeros() {
             const numeroInicial = document.getElementById("inputNumero").value;
             const quantidade = document.getElementById("quantidade").value;
-            const nome = document.getElementById("inputNome").value;
 
             // Verificar se os campos foram preenchidos corretamente
-            if (!numeroInicial || !quantidade || !nome) {
+            if (!numeroInicial || !quantidade) {
                 alert("Por favor, preencha todos os campos.");
                 return;
             }
 
+            // Limpar a lista anterior, caso exista
+            listaNumeros.length = 0;
+
             // Gerar os números e adicionar à lista
             for (let i = 0; i < quantidade; i++) {
                 const numero = parseInt(numeroInicial) + i;
-                listaNumeros.push({ numero: numero.toString(), nome: nome, status: "pendente" });
+                listaNumeros.push({ numero: numero.toString(), nome: "", status: "pendente" });
+            }
+
+            numeroAtual = parseInt(numeroInicial);
+
+            // Atualizar a lista na tela
+            atualizarLista();
+
+            // Exibir o formulário para adicionar nomes
+            document.getElementById("formularioNome").style.display = "block";
+        }
+
+        function adicionarNome() {
+            const nome = document.getElementById("inputNome").value;
+
+            if (!nome) {
+                alert("Por favor, insira um nome.");
+                return;
+            }
+
+            // Verificar se já existe algum número sem nome
+            for (let i = 0; i < listaNumeros.length; i++) {
+                if (listaNumeros[i].nome === "") {
+                    listaNumeros[i].nome = nome;
+                    break;
+                }
             }
 
             // Atualizar a lista na tela
             atualizarLista();
+
+            // Limpar o campo de nome
+            document.getElementById("inputNome").value = "";
         }
 
         function atualizarLista() {
@@ -168,7 +205,7 @@
 
             listaNumeros.forEach((item, index) => {
                 const li = document.createElement("li");
-                li.textContent = `Número: ${item.numero} - Nome: ${item.nome}`;
+                li.textContent = `Número: ${item.numero} - Nome: ${item.nome || "Não atribuído"}`;
 
                 const btnPagar = document.createElement("button");
                 btnPagar.textContent = "Pago";
@@ -207,6 +244,34 @@
         function removerNumero(index) {
             listaNumeros.splice(index, 1);
             atualizarLista();
+        }
+
+        function removerTodos() {
+            // Limpa todos os nomes da lista
+            for (let i = 0; i < listaNumeros.length; i++) {
+                listaNumeros[i].nome = "";
+            }
+            atualizarLista();
+        }
+
+        function verificarPreenchido() {
+            // Verifica se há algum número preenchido
+            const numeroPreenchido = listaNumeros.find(item => item.nome !== "");
+            if (numeroPreenchido) {
+                alert("Número já preenchido: " + numeroPreenchido.numero);
+            } else {
+                alert("Nenhum número foi preenchido ainda.");
+            }
+        }
+
+        function verificarAberto() {
+            // Verifica se há algum número sem nome (aberto)
+            const numeroAberto = listaNumeros.find(item => item.nome === "");
+            if (numeroAberto) {
+                alert("Número aberto para preencher: " + numeroAberto.numero);
+            } else {
+                alert("Todos os números foram preenchidos.");
+            }
         }
     </script>
 
