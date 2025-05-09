@@ -69,15 +69,6 @@
             background-color: #0056b3;
         }
 
-        .botao-vermelho {
-            background-color: #FF5733;
-            color: white;
-        }
-
-        .botao-vermelho:hover {
-            background-color: #ff3b1f;
-        }
-
         .num-list {
             list-style: none;
             padding: 0;
@@ -119,19 +110,17 @@
 
     <div class="container">
         <h2>Gerar Lista de Números</h2>
-        <input type="number" id="inputNumero" placeholder="Número Inicial" />
-        <input type="number" id="quantidade" placeholder="Quantidade" />
+        <input type="number" id="quantidade" placeholder="Quantidade de Números" />
         <button class="botao-azul" onclick="gerarNumeros()">Gerar Lista Numérica</button>
 
-        <!-- Formulário de adicionar nomes aos números -->
-        <div id="formularioNome" style="display: none;">
-            <h3>Adicionar Nomes aos Números</h3>
-            <ul id="listaNumeros"></ul>
+        <div id="formularioCadastro" style="display: none;">
+            <h3>Adicionar Nome ao Número</h3>
+            <input type="number" id="numeroEscolhido" placeholder="Digite o Número" />
+            <input type="text" id="nomePessoa" placeholder="Digite o Nome" />
+            <button class="botao-verde" onclick="cadastrarNome()">Cadastrar Nome</button>
 
-            <h3>Ações</h3>
-            <button class="botao-azul" onclick="removerTodos()">Remover Todos os Nomes</button>
-            <button class="botao-verde" onclick="verificarPreenchido()">Verificar Se Está Preenchido</button>
-            <button class="botao-azul" onclick="verificarAberto()">Verificar Se Está Aberto</button>
+            <h3>Lista de Números</h3>
+            <ul id="listaNumeros" class="num-list"></ul>
         </div>
     </div>
 
@@ -141,51 +130,42 @@
 
     <script>
         const listaNumeros = [];
-        let numeroAtual = 0;
 
         function gerarNumeros() {
-            const numeroInicial = document.getElementById("inputNumero").value;
             const quantidade = document.getElementById("quantidade").value;
 
-            // Verificar se os campos foram preenchidos corretamente
-            if (!numeroInicial || !quantidade) {
-                alert("Por favor, preencha todos os campos.");
+            if (!quantidade || quantidade <= 0) {
+                alert("Por favor, insira uma quantidade válida de números.");
                 return;
             }
 
-            // Limpar a lista anterior, caso exista
+            // Limpar a lista existente
             listaNumeros.length = 0;
 
-            // Gerar os números e adicionar à lista
-            for (let i = 0; i < quantidade; i++) {
-                const numero = parseInt(numeroInicial) + i;
-                listaNumeros.push({ numero: numero.toString(), nome: "", status: "pendente" });
+            // Gerar os números na lista
+            for (let i = 1; i <= quantidade; i++) {
+                listaNumeros.push({ numero: i.toString(), nome: "", status: "pendente" });
             }
 
-            numeroAtual = parseInt(numeroInicial);
+            // Exibir o formulário para cadastrar nomes
+            document.getElementById("formularioCadastro").style.display = "block";
 
-            // Atualizar a lista na tela
+            // Atualizar a lista exibida na tela
             atualizarLista();
-
-            // Exibir o formulário para adicionar nomes e as ações
-            document.getElementById("formularioNome").style.display = "block";
         }
 
         function atualizarLista() {
             const listaElement = document.getElementById("listaNumeros");
-            listaElement.innerHTML = ""; // Limpa a lista
+            listaElement.innerHTML = ""; // Limpar a lista
 
-            listaNumeros.forEach((item, index) => {
+            listaNumeros.forEach((item) => {
                 const li = document.createElement("li");
 
-                // Adiciona o número, campos de nome e número, e o botão de cadastro
+                // Exibir o número e o nome
                 li.innerHTML = `
                     <span>Número: ${item.numero}</span>
                     <br>
-                    <input type="text" id="nome_${item.numero}" placeholder="Nome" />
-                    <button class="botao-verde" onclick="cadastrarNome(${index})">Cadastrar</button>
-                    <button class="botao-vermelho" onclick="removerNumero(${index})">Remover</button>
-                    <span id="nome_${item.numero}">Nome: ${item.nome ? item.nome : "Não atribuído"}</span>
+                    <span>Nome: ${item.nome ? item.nome : "Não atribuído"}</span>
                 `;
 
                 if (item.status === "pago") {
@@ -198,50 +178,25 @@
             });
         }
 
-        function cadastrarNome(index) {
-            const nome = document.getElementById(`nome_${listaNumeros[index].numero}`).value;
+        function cadastrarNome() {
+            const numeroEscolhido = document.getElementById("numeroEscolhido").value;
+            const nomePessoa = document.getElementById("nomePessoa").value;
 
-            if (!nome) {
-                alert("Por favor, insira um nome.");
+            if (!numeroEscolhido || !nomePessoa) {
+                alert("Por favor, insira o número e o nome.");
                 return;
             }
 
-            listaNumeros[index].nome = nome;
+            const numeroEncontrado = listaNumeros.find(item => item.numero === numeroEscolhido);
 
-            // Atualizar a lista na tela
-            atualizarLista();
-        }
-
-        function removerNumero(index) {
-            listaNumeros.splice(index, 1);
-            atualizarLista();
-        }
-
-        function removerTodos() {
-            // Limpa todos os nomes da lista
-            for (let i = 0; i < listaNumeros.length; i++) {
-                listaNumeros[i].nome = "";
-            }
-            atualizarLista();
-        }
-
-        function verificarPreenchido() {
-            // Verifica se há algum número preenchido
-            const numeroPreenchido = listaNumeros.find(item => item.nome !== "");
-            if (numeroPreenchido) {
-                alert("Número já preenchido: " + numeroPreenchido.numero);
+            if (numeroEncontrado) {
+                numeroEncontrado.nome = nomePessoa;
+                numeroEncontrado.status = "pago"; // Marcar como pago
+                alert(`Nome "${nomePessoa}" cadastrado para o número ${numeroEscolhido}.`);
+                // Atualizar a lista
+                atualizarLista();
             } else {
-                alert("Nenhum número foi preenchido ainda.");
-            }
-        }
-
-        function verificarAberto() {
-            // Verifica se há algum número sem nome (aberto)
-            const numeroAberto = listaNumeros.find(item => item.nome === "");
-            if (numeroAberto) {
-                alert("Número aberto para preencher: " + numeroAberto.numero);
-            } else {
-                alert("Todos os números foram preenchidos.");
+                alert("Número não encontrado.");
             }
         }
     </script>
