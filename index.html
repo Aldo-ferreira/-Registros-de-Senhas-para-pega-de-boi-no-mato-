@@ -3,230 +3,592 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Senhas e Números</title>
+    <title>Sistema Pega de Boi - Online</title>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            color: #333;
+        /* Reset e estilos base */
+        * {
             margin: 0;
             padding: 0;
-            text-align: center;
+            box-sizing: border-box;
         }
 
-        header {
-            background-color: #4CAF50;
-            color: white;
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
             padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        /* Área de Login */
+        #loginArea {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        #loginArea h2 {
+            text-align: center;
+            color: #333;
             margin-bottom: 20px;
         }
 
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 20px auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        input[type="number"], input[type="text"], button {
+        #loginArea input {
+            width: 100%;
             padding: 10px;
-            margin: 10px;
+            margin: 10px 0;
             border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1em;
+            border-radius: 4px;
         }
 
-        button {
+        #loginArea button {
+            width: 100%;
+            padding: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
             cursor: pointer;
         }
 
-        button:hover {
-            opacity: 0.8;
+        #loginMessage {
+            color: red;
+            margin-top: 10px;
+            text-align: center;
         }
 
-        .botao-verde {
-            background-color: #4CAF50;
-            color: white;
+        /* Estilos de texto */
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #333;
         }
 
-        .botao-verde:hover {
-            background-color: #45a049;
+        h2 {
+            font-size: 1.5rem;
+            margin: 20px 0;
+            color: #444;
         }
 
-        .botao-azul {
-            background-color: #007BFF;
-            color: white;
+        h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #666;
         }
 
-        .botao-azul:hover {
-            background-color: #0056b3;
+        /* Formulários e inputs */
+        .form-group {
+            margin-bottom: 15px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .botao-vermelho {
-            background-color: #FF5733;
-            color: white;
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
         }
 
-        .botao-vermelho:hover {
-            background-color: #ff3b1f;
-        }
-
-        .num-list {
-            list-style: none;
-            padding: 0;
-            margin-top: 20px;
-            text-align: left;
-        }
-
-        .num-list li {
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+        input[type="number"],
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
             margin: 5px 0;
-            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
         }
 
-        .pago {
-            color: green;
-            font-weight: bold;
-        }
-
-        .pendente {
-            color: orange;
-            font-weight: bold;
-        }
-
-        footer {
-            background-color: #333;
-            color: white;
-            padding: 10px;
+        /* Tabela responsiva */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
             margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .icone {
-            margin-right: 10px;
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 20px;
+            min-width: 600px;
+        }
+
+        th, td { 
+            border: 1px solid #ddd; 
+            padding: 12px 8px; 
+            text-align: center; 
+        }
+
+        th { 
+            background-color: #f8f9fa; 
+            color: #333;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        /* Botões */
+        .btn-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 10px 0;
+        }
+
+        button { 
+            padding: 10px 15px;
+            cursor: pointer; 
+            border: none; 
+            color: white; 
+            font-weight: bold;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Classes de status */
+        .pago { 
+            color: #28a745; 
+            font-weight: bold; 
+        }
+
+        /* Área do WhatsApp */
+        #listaWhatsApp { 
+            width: 100%; 
+            height: 200px;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+        }
+
+        /* Cores dos botões */
+        .registrar-btn { background-color: #007bff; }
+        .registrar-btn:hover { background-color: #0056b3; }
+        .pago-btn { background-color: #28a745; }
+        .pago-btn:hover { background-color: #218838; }
+        .editar-btn { background-color: #ffc107; color: #000; }
+        .editar-btn:hover { background-color: #e0a800; }
+        .disponibilizar-btn { background-color: #dc3545; }
+        .disponibilizar-btn:hover { background-color: #c82333; }
+        .gerar-btn { background-color: #17a2b8; }
+        .gerar-btn:hover { background-color: #138496; }
+        .limpar-btn { background-color: #6c757d; }
+        .limpar-btn:hover { background-color: #5a6268; }
+        .disponibilizar-todo-btn { background-color: #007bff; }
+        .disponibilizar-todo-btn:hover { background-color: #0056b3; }
+        .reverter-btn { background-color: #fd7e14; }
+        .reverter-btn:hover { background-color: #e65c10; }
+
+        /* Status online */
+        #statusOnline {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .online {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .offline {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        /* Media Queries para Responsividade */
+        @media (max-width: 768px) {
+            body {
+                margin: 10px;
+                padding: 10px;
+            }
+
+            h1 { font-size: 1.5rem; }
+            h2 { font-size: 1.3rem; }
+            h3 { font-size: 1rem; }
+
+            .btn-container {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+                margin: 5px 0;
+            }
+
+            td button {
+                margin: 2px;
+                padding: 8px;
+                font-size: 12px;
+                min-width: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                margin: 5px;
+                padding: 5px;
+            }
+
+            h1 { font-size: 1.2rem; }
+            
+            table { font-size: 14px; }
+            
+            td button {
+                padding: 6px;
+                font-size: 11px;
+            }
+
+            input[type="number"],
+            input[type="text"] {
+                font-size: 14px;
+                padding: 8px;
+            }
+        }
+
+        /* Melhorias para dispositivos touch */
+        @media (hover: none) {
+            button {
+                padding: 12px 20px;
+            }
+
+            input[type="number"],
+            input[type="text"] {
+                padding: 12px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Status Online -->
+    <div id="statusOnline"></div>
 
-    <header>
-        <h1>Sistema de Senhas e Lista de Números</h1>
-    </header>
-
-    <div class="container">
-        <h2>Adicionar Número e Nome</h2>
-        <input type="number" id="inputNumero" placeholder="Número" />
-        <input type="text" id="inputNome" placeholder="Nome" />
-        <input type="number" id="quantidade" placeholder="Quantidade" />
-        <button class="botao-azul" onclick="adicionarNumero()">Adicionar Número</button>
-
-        <h2>Escolher Senha</h2>
-        <input type="text" id="inputSenha" placeholder="Senha" />
-        <button class="botao-verde" onclick="adicionarSenha()">Adicionar Senha</button>
-        <button class="botao-vermelho" onclick="limparLista()">Limpar Lista</button>
-
-        <h3>Lista de Números e Nomes</h3>
-        <ul class="num-list" id="listaNumeros">
-            <!-- Números e Nomes serão listados aqui -->
-        </ul>
+    <!-- Área de Login -->
+    <div id="loginArea">
+        <h2>Login de Administrador</h2>
+        <input type="email" id="emailLogin" placeholder="Email">
+        <input type="password" id="senhaLogin" placeholder="Senha">
+        <button onclick="fazerLogin()">Entrar</button>
+        <p id="loginMessage"></p>
     </div>
 
-    <footer>
-        <p>&copy; 2025 Sistema de Senhas - Todos os direitos reservados</p>
-    </footer>
+    <!-- Área Principal -->
+    <div id="mainArea" style="display: none;">
+        <h1>Sistema Pega de Boi - Online</h1>
+        <h3>Escolha seu número e registre seu nome!</h3>
+
+        <div class="btn-container">
+            <button class="disponibilizar-todo-btn" onclick="disponibilizarTodos()">Disponibilizar Todos</button>
+            <button class="reverter-btn" onclick="reverterDisponibilizacao()">Reverter Disponibilização</button>
+            <button onclick="fazerLogout()" class="limpar-btn">Sair</button>
+        </div>
+
+        <div class="form-group">
+            <label for="quantidade">Quantidade de Números:</label>
+            <input type="number" id="quantidade" min="1" max="500" value="200" onchange="atualizarQuantidade()">
+        </div>
+
+        <div class="form-group">
+            <label for="numero">Número (1 a <span id="maxNumero">200</span>):</label>
+            <input type="number" id="numero" min="1" placeholder="Digite o número">
+            <label for="nome">Nome:</label>
+            <input type="text" id="nome" placeholder="Digite o nome">
+            <button class="registrar-btn" onclick="registrar()">Registrar</button>
+        </div>
+
+        <div class="form-group">
+            <h2>Verificar Disponibilidade</h2>
+            <input type="number" id="verificarNumero" min="1" placeholder="Digite o número">
+            <button class="gerar-btn" onclick="verificarDisponibilidade()">Verificar</button>
+            <p id="statusNumero"></p>
+        </div>
+
+        <div class="table-container">
+            <h2>Lista de Números Escolhidos</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Número</th>
+                        <th>Nome</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela"></tbody>
+            </table>
+        </div>
+
+        <div class="form-group">
+            <button class="gerar-btn" onclick="gerarLista()">Gerar Lista para WhatsApp</button>
+            <textarea id="listaWhatsApp" rows="10" placeholder="Lista gerada aparecerá aqui..." readonly></textarea>
+        </div>
+    </div>
 
     <script>
-        const listaNumeros = [];
+        // Configuração do Firebase - SUBSTITUA COM SUAS CONFIGURAÇÕES
+        const firebaseConfig = {
+            apiKey: "SUA-API-KEY",
+            authDomain: "seu-projeto.firebaseapp.com",
+            databaseURL: "https://seu-projeto.firebaseio.com",
+            projectId: "seu-projeto",
+            storageBucket: "seu-projeto.appspot.com",
+            messagingSenderId: "seu-messaging-id",
+            appId: "seu-app-id"
+        };
 
-        function adicionarNumero() {
-            const numero = document.getElementById("inputNumero").value;
-            const nome = document.getElementById("inputNome").value;
-            const quantidade = document.getElementById("quantidade").value;
-            const senha = document.getElementById("inputSenha").value;
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const auth = firebase.auth();
 
-            if (!numero || !nome || !quantidade || !senha) {
-                alert("Por favor, preencha todos os campos.");
-                return;
+        // Variáveis globais
+        let maxNumeros = 200;
+        let numeros = [];
+        let backupNumeros = [];
+
+        // Monitor de status online
+        function atualizarStatusOnline() {
+            const statusElement = document.getElementById('statusOnline');
+            if (navigator.onLine) {
+                statusElement.textContent = '🟢 Online';
+                statusElement.className = 'online';
+            } else {
+                statusElement.textContent = '🔴 Offline';
+                statusElement.className = 'offline';
             }
-
-            for (let i = 0; i < quantidade; i++) {
-                listaNumeros.push({ numero: `${numero + i}`, nome: nome, senha: senha, status: "pendente" });
-            }
-
-            atualizarLista();
         }
 
-        function adicionarSenha() {
-            const senha = document.getElementById("inputSenha").value;
-            if (!senha) {
-                alert("Por favor, insira uma senha.");
-                return;
-            }
+        window.addEventListener('online', atualizarStatusOnline);
+        window.addEventListener('offline', atualizarStatusOnline);
+        atualizarStatusOnline();
 
-            alert(`Senha adicionada: ${senha}`);
-            document.getElementById("inputSenha").value = ""; // Limpa o campo de senha
+        // Funções de Autenticação
+        function fazerLogin() {
+            const email = document.getElementById('emailLogin').value;
+            const senha = document.getElementById('senhaLogin').value;
+            
+            auth.signInWithEmailAndPassword(email, senha)
+                .then((userCredential) => {
+                    document.getElementById('loginArea').style.display = 'none';
+                    document.getElementById('mainArea').style.display = 'block';
+                })
+                .catch((error) => {
+                    document.getElementById('loginMessage').textContent = 
+                        'Erro no login: ' + error.message;
+                });
         }
 
-        function limparLista() {
-            listaNumeros.length = 0;
-            atualizarLista();
-        }
-
-        function atualizarLista() {
-            const listaElement = document.getElementById("listaNumeros");
-            listaElement.innerHTML = ""; // Limpa a lista
-
-            listaNumeros.forEach((item, index) => {
-                const li = document.createElement("li");
-                li.textContent = `${item.numero} - ${item.nome} - Senha: ${item.senha}`;
-
-                const btnPagar = document.createElement("button");
-                btnPagar.textContent = "Pago";
-                btnPagar.classList.add("botao-verde");
-                btnPagar.onclick = function() { mudarStatus(index, "pago"); };
-
-                const btnPendente = document.createElement("button");
-                btnPendente.textContent = "Pendente";
-                btnPendente.classList.add("botao-azul");
-                btnPendente.onclick = function() { mudarStatus(index, "pendente"); };
-
-                const btnRemover = document.createElement("button");
-                btnRemover.textContent = "Remover";
-                btnRemover.classList.add("botao-vermelho");
-                btnRemover.onclick = function() { removerNumero(index); };
-
-                li.appendChild(btnPagar);
-                li.appendChild(btnPendente);
-                li.appendChild(btnRemover);
-
-                if (item.status === "pago") {
-                    li.classList.add("pago");
-                } else {
-                    li.classList.add("pendente");
-                }
-
-                listaElement.appendChild(li);
+        function fazerLogout() {
+            auth.signOut().then(() => {
+                document.getElementById('loginArea').style.display = 'block';
+                document.getElementById('mainArea').style.display = 'none';
             });
         }
 
-        function mudarStatus(index, status) {
-            listaNumeros[index].status = status;
-            atualizarLista();
+        // Verificar estado de autenticação
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                document.getElementById('loginArea').style.display = 'none';
+                document.getElementById('mainArea').style.display = 'block';
+                carregarDados();
+            } else {
+                document.getElementById('loginArea').style.display = 'block';
+                document.getElementById('mainArea').style.display = 'none';
+            }
+        });
+
+        // Funções do Firebase
+        function carregarDados() {
+            database.ref('numeros').on('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    numeros = snapshot.val();
+                } else {
+                    numeros = Array.from({ length: maxNumeros }, 
+                        (_, i) => ({ numero: i + 1, nome: '', pago: false }));
+                }
+                atualizarTabela();
+            });
+
+            database.ref('backup').on('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    backupNumeros = snapshot.val();
+                }
+            });
         }
 
-        function removerNumero(index) {
-            listaNumeros.splice(index, 1);
-            atualizarLista();
+        function atualizarQuantidade() {
+            maxNumeros = parseInt(document.getElementById('quantidade').value);
+            document.getElementById('maxNumero').textContent = maxNumeros;
+            
+            if (numeros.length > maxNumeros) {
+                numeros.length = maxNumeros;
+            } else {
+                while (numeros.length < maxNumeros) {
+                    numeros.push({ numero: numeros.length + 1, nome: '', pago: false });
+                }
+            }
+            database.ref('numeros').set(numeros);
         }
+
+        function atualizarTabela() {
+            const tabela = document.getElementById('tabela');
+            tabela.innerHTML = '';
+            
+            numeros.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.numero}</td>
+                    <td>${item.nome || 'Disponível'}</td>
+                    <td class="${item.pago ? 'pago' : ''}">${item.pago ? 'Pago' : (item.nome ? 'Pendente' : 'Disponível')}</td>
+                    <td>
+                        ${item.nome ? `
+                            <button class="pago-btn" onclick="marcarPago(${item.numero})">${item.pago ? 'Cancelar Pago' : 'Marcar Pago'}</button>
+                            <button class="editar-btn" onclick="editar(${item.numero})">Editar</button>
+                            <button class="disponibilizar-btn" onclick="disponibilizar(${item.numero})">Disponibilizar</button>
+                        ` : ''}
+                    </td>
+                `;
+                tabela.appendChild(row);
+            });
+        }
+
+        function registrar() {
+            const numero = parseInt(document.getElementById('numero').value);
+            const nome = document.getElementById('nome').value.trim();
+
+            if (!numero || numero < 1 || numero > maxNumeros) {
+                alert(`Por favor, escolha um número válido entre 1 e ${maxNumeros}.`);
+                return;
+            }
+            if (!nome) {
+                alert('Por favor, insira o nome.');
+                return;
+            }
+
+            const index = numeros.findIndex(item => item.numero === numero);
+            if (numeros[index].nome) {
+                alert('Esse número já foi escolhido. Por favor, escolha outro.');
+                return;
+            }
+
+            numeros[index].nome = nome;
+            database.ref('numeros').set(numeros);
+
+            document.getElementById('numero').value = '';
+            document.getElementById('nome').value = '';
+        }
+
+        function marcarPago(numero) {
+            const index = numeros.findIndex(item => item.numero === numero);
+            if (index >= 0) {
+                numeros[index].pago = !numeros[index].pago;
+                database.ref('numeros').set(numeros);
+            }
+        }
+
+        function editar(numero) {
+            const index = numeros.findIndex(item => item.numero === numero);
+            if (index >= 0) {
+                const novoNome = prompt('Digite o novo nome:', numeros[index].nome);
+                if (novoNome !== null) {
+                    numeros[index].nome = novoNome.trim();
+                    database.ref('numeros').set(numeros);
+                }
+            }
+        }
+
+        function disponibilizar(numero) {
+            const index = numeros.findIndex(item => item.numero === numero);
+            if (index >= 0) {
+                numeros[index].nome = '';
+                numeros[index].pago = false;
+                database.ref('numeros').set(numeros);
+            }
+        }
+
+        function disponibilizarTodos() {
+            if (confirm('Tem certeza que deseja disponibilizar todos os números novamente?')) {
+                database.ref('backup').set(numeros);
+                numeros.forEach(item => {
+                    item.nome = '';
+                    item.pago = false;
+                });
+                database.ref('numeros').set(numeros);
+            }
+        }
+
+        function reverterDisponibilizacao() {
+            if (confirm('Tem certeza que deseja reverter a disponibilização de todos os números?')) {
+                database.ref('backup').once('value').then((snapshot) => {
+                    if (snapshot.exists()) {
+                        numeros = snapshot.val();
+                        database.ref('numeros').set(numeros);
+                    }
+                });
+            }
+        }
+
+        function verificarDisponibilidade() {
+            const numero = parseInt(document.getElementById('verificarNumero').value);
+            const statusElement = document.getElementById('statusNumero');
+
+            if (numero < 1 || numero > maxNumeros) {
+                statusElement.textContent = `Por favor, insira um número válido entre 1 e ${maxNumeros}.`;
+                return;
+            }
+
+            const index = numeros.findIndex(item => item.numero === numero);
+            if (index >= 0) {
+                statusElement.textContent = numeros[index].nome
+                    ? `Número ${numero} já foi escolhido por ${numeros[index].nome}.`
+                    : `Número ${numero} está disponível.`;
+            }
+        }
+
+        function gerarLista() {
+            const lista = numeros
+                .filter(item => item.nome)
+                .map(item => `${item.numero} - ${item.nome}${item.pago ? ' (PAGO)' : ''}`)
+                .join('\n');
+            document.getElementById('listaWhatsApp').value = lista;
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            atualizarStatusOnline();
+        });
     </script>
-
 </body>
 </html>
+
