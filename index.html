@@ -123,21 +123,22 @@
         <input type="number" id="quantidade" placeholder="Quantidade" />
         <button class="botao-azul" onclick="gerarNumeros()">Gerar Lista Numérica</button>
 
+        <!-- Formulário de adicionar nomes e botões para ações só será visível após gerar a lista -->
         <div id="formularioNome" style="display: none;">
             <h3>Adicionar Nomes aos Números</h3>
             <input type="text" id="inputNome" placeholder="Nome" />
             <button class="botao-verde" onclick="adicionarNome()">Adicionar Nome</button>
+
+            <h3>Ações</h3>
+            <button class="botao-azul" onclick="removerTodos()">Remover Todos os Nomes</button>
+            <button class="botao-verde" onclick="verificarPreenchido()">Verificar Se Está Preenchido</button>
+            <button class="botao-azul" onclick="verificarAberto()">Verificar Se Está Aberto</button>
         </div>
 
         <h3>Lista de Números e Nomes</h3>
         <ul class="num-list" id="listaNumeros">
             <!-- Números e Nomes serão listados aqui -->
         </ul>
-
-        <h3>Ações</h3>
-        <button class="botao-azul" onclick="removerTodos()">Remover Todos os Nomes</button>
-        <button class="botao-verde" onclick="verificarPreenchido()">Verificar Se Está Preenchido</button>
-        <button class="botao-azul" onclick="verificarAberto()">Verificar Se Está Aberto</button>
     </div>
 
     <footer>
@@ -172,7 +173,7 @@
             // Atualizar a lista na tela
             atualizarLista();
 
-            // Exibir o formulário para adicionar nomes
+            // Exibir o formulário para adicionar nomes e as ações
             document.getElementById("formularioNome").style.display = "block";
         }
 
