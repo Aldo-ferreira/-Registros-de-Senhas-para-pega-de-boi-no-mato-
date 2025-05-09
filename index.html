@@ -35,7 +35,7 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        input[type="number"], input[type="text"], button {
+        input[type="number"], button {
             padding: 10px;
             margin: 10px;
             border: 1px solid #ddd;
@@ -123,22 +123,16 @@
         <input type="number" id="quantidade" placeholder="Quantidade" />
         <button class="botao-azul" onclick="gerarNumeros()">Gerar Lista Numérica</button>
 
-        <!-- Formulário de adicionar nomes e botões para ações só será visível após gerar a lista -->
+        <!-- Formulário de adicionar nomes aos números -->
         <div id="formularioNome" style="display: none;">
             <h3>Adicionar Nomes aos Números</h3>
-            <input type="text" id="inputNome" placeholder="Nome" />
-            <button class="botao-verde" onclick="adicionarNome()">Adicionar Nome</button>
+            <ul id="listaNumeros"></ul>
 
             <h3>Ações</h3>
             <button class="botao-azul" onclick="removerTodos()">Remover Todos os Nomes</button>
             <button class="botao-verde" onclick="verificarPreenchido()">Verificar Se Está Preenchido</button>
             <button class="botao-azul" onclick="verificarAberto()">Verificar Se Está Aberto</button>
         </div>
-
-        <h3>Lista de Números e Nomes</h3>
-        <ul class="num-list" id="listaNumeros">
-            <!-- Números e Nomes serão listados aqui -->
-        </ul>
     </div>
 
     <footer>
@@ -177,55 +171,17 @@
             document.getElementById("formularioNome").style.display = "block";
         }
 
-        function adicionarNome() {
-            const nome = document.getElementById("inputNome").value;
-
-            if (!nome) {
-                alert("Por favor, insira um nome.");
-                return;
-            }
-
-            // Verificar se já existe algum número sem nome
-            for (let i = 0; i < listaNumeros.length; i++) {
-                if (listaNumeros[i].nome === "") {
-                    listaNumeros[i].nome = nome;
-                    break;
-                }
-            }
-
-            // Atualizar a lista na tela
-            atualizarLista();
-
-            // Limpar o campo de nome
-            document.getElementById("inputNome").value = "";
-        }
-
         function atualizarLista() {
             const listaElement = document.getElementById("listaNumeros");
             listaElement.innerHTML = ""; // Limpa a lista
 
             listaNumeros.forEach((item, index) => {
                 const li = document.createElement("li");
-                li.textContent = `Número: ${item.numero} - Nome: ${item.nome || "Não atribuído"}`;
-
-                const btnPagar = document.createElement("button");
-                btnPagar.textContent = "Pago";
-                btnPagar.classList.add("botao-verde");
-                btnPagar.onclick = function() { mudarStatus(index, "pago"); };
-
-                const btnPendente = document.createElement("button");
-                btnPendente.textContent = "Pendente";
-                btnPendente.classList.add("botao-azul");
-                btnPendente.onclick = function() { mudarStatus(index, "pendente"); };
-
-                const btnRemover = document.createElement("button");
-                btnRemover.textContent = "Remover";
-                btnRemover.classList.add("botao-vermelho");
-                btnRemover.onclick = function() { removerNumero(index); };
-
-                li.appendChild(btnPagar);
-                li.appendChild(btnPendente);
-                li.appendChild(btnRemover);
+                li.innerHTML = `Número: ${item.numero} 
+                    <input type="text" id="nome_${item.numero}" placeholder="Nome" />
+                    <button class="botao-verde" onclick="adicionarNome(${index})">Adicionar Nome</button>
+                    <button class="botao-vermelho" onclick="removerNumero(${index})">Remover</button>
+                `;
 
                 if (item.status === "pago") {
                     li.classList.add("pago");
@@ -237,8 +193,17 @@
             });
         }
 
-        function mudarStatus(index, status) {
-            listaNumeros[index].status = status;
+        function adicionarNome(index) {
+            const nome = document.getElementById(`nome_${listaNumeros[index].numero}`).value;
+
+            if (!nome) {
+                alert("Por favor, insira um nome.");
+                return;
+            }
+
+            listaNumeros[index].nome = nome;
+
+            // Atualizar a lista na tela
             atualizarLista();
         }
 
