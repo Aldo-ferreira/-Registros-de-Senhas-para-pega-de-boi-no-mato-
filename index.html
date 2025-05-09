@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Senhas e Lista de Números</title>
+    <title>Sistema de Senhas e Números</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -35,7 +35,7 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        input[type="text"], input[type="number"], button {
+        input[type="number"], input[type="text"], button {
             padding: 10px;
             margin: 10px;
             border: 1px solid #ddd;
@@ -125,6 +125,7 @@
         <h2>Adicionar Número e Nome</h2>
         <input type="number" id="inputNumero" placeholder="Número" />
         <input type="text" id="inputNome" placeholder="Nome" />
+        <input type="number" id="quantidade" placeholder="Quantidade" />
         <button class="botao-azul" onclick="adicionarNumero()">Adicionar Número</button>
 
         <h2>Escolher Senha</h2>
@@ -148,15 +149,17 @@
         function adicionarNumero() {
             const numero = document.getElementById("inputNumero").value;
             const nome = document.getElementById("inputNome").value;
+            const quantidade = document.getElementById("quantidade").value;
             const senha = document.getElementById("inputSenha").value;
 
-            if (!numero || !nome || !senha) {
+            if (!numero || !nome || !quantidade || !senha) {
                 alert("Por favor, preencha todos os campos.");
                 return;
             }
 
-            const numeroFormatado = `Número ${numero} - ${nome} - Senha: ${senha}`;
-            listaNumeros.push({ numero: numero, nome: nome, senha: senha, status: "pendente" });
+            for (let i = 0; i < quantidade; i++) {
+                listaNumeros.push({ numero: `${numero + i}`, nome: nome, senha: senha, status: "pendente" });
+            }
 
             atualizarLista();
         }
@@ -192,7 +195,7 @@
 
                 const btnPendente = document.createElement("button");
                 btnPendente.textContent = "Pendente";
-                btnPendente.classList.add("botao-laranja");
+                btnPendente.classList.add("botao-azul");
                 btnPendente.onclick = function() { mudarStatus(index, "pendente"); };
 
                 const btnRemover = document.createElement("button");
