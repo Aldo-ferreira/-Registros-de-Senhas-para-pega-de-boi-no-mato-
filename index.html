@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerenciamento de Números</title>
+    <title>Sistema de Senhas e Lista de Números</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -35,7 +35,7 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        input[type="number"], button {
+        input[type="text"], input[type="number"], button {
             padding: 10px;
             margin: 10px;
             border: 1px solid #ddd;
@@ -78,15 +78,6 @@
             background-color: #ff3b1f;
         }
 
-        .botao-laranja {
-            background-color: #FFC107;
-            color: white;
-        }
-
-        .botao-laranja:hover {
-            background-color: #e69500;
-        }
-
         .num-list {
             list-style: none;
             padding: 0;
@@ -127,68 +118,58 @@
 <body>
 
     <header>
-        <h1>Gerenciamento de Números</h1>
+        <h1>Sistema de Senhas e Lista de Números</h1>
     </header>
 
     <div class="container">
-        <h2>Escolha a quantidade de números</h2>
-        <input type="number" id="quantidade" placeholder="Quantidade de números" min="1" max="50" />
-        <button class="botao-azul" onclick="gerarNumeros()">Gerar Números</button>
+        <h2>Adicionar Número e Nome</h2>
+        <input type="number" id="inputNumero" placeholder="Número" />
+        <input type="text" id="inputNome" placeholder="Nome" />
+        <button class="botao-azul" onclick="adicionarNumero()">Adicionar Número</button>
 
-        <h2>Digite o número</h2>
-        <input type="number" id="inputNumero" placeholder="Número para verificar" />
-        <button class="botao-verde" onclick="verificarNumero()">Verificar Número</button>
-        <button class="botao-verde" onclick="disponibilizarNumero()">Disponibilizar Número</button>
+        <h2>Escolher Senha</h2>
+        <input type="text" id="inputSenha" placeholder="Senha" />
+        <button class="botao-verde" onclick="adicionarSenha()">Adicionar Senha</button>
         <button class="botao-vermelho" onclick="limparLista()">Limpar Lista</button>
 
-        <h3>Lista de Números Disponíveis</h3>
+        <h3>Lista de Números e Nomes</h3>
         <ul class="num-list" id="listaNumeros">
-            <!-- Números serão listados aqui -->
+            <!-- Números e Nomes serão listados aqui -->
         </ul>
-
-        <button class="botao-laranja" onclick="gerarWhatsApp()">Gerar Lista para WhatsApp</button>
-        <p id="whatsappLink"></p>
     </div>
 
     <footer>
-        <p>&copy; 2025 Gerenciamento de Números - Todos os direitos reservados</p>
+        <p>&copy; 2025 Sistema de Senhas - Todos os direitos reservados</p>
     </footer>
 
     <script>
         const listaNumeros = [];
-        let quantidadeDesejada = 0;
 
-        function gerarNumeros() {
-            quantidadeDesejada = parseInt(document.getElementById("quantidade").value);
-            if (isNaN(quantidadeDesejada) || quantidadeDesejada <= 0) {
-                alert("Por favor, insira uma quantidade válida.");
+        function adicionarNumero() {
+            const numero = document.getElementById("inputNumero").value;
+            const nome = document.getElementById("inputNome").value;
+            const senha = document.getElementById("inputSenha").value;
+
+            if (!numero || !nome || !senha) {
+                alert("Por favor, preencha todos os campos.");
                 return;
             }
 
-            // Gerar números sequenciais para exemplificação
-            for (let i = 0; i < quantidadeDesejada; i++) {
-                listaNumeros.push(`Número ${i + 1}`);
-            }
+            const numeroFormatado = `Número ${numero} - ${nome} - Senha: ${senha}`;
+            listaNumeros.push({ numero: numero, nome: nome, senha: senha, status: "pendente" });
+
             atualizarLista();
         }
 
-        function verificarNumero() {
-            const numero = document.getElementById("inputNumero").value;
-            if (numero && !listaNumeros.includes(numero)) {
-                alert("Número está disponível!");
-            } else {
-                alert("Número já está na lista ou é inválido.");
+        function adicionarSenha() {
+            const senha = document.getElementById("inputSenha").value;
+            if (!senha) {
+                alert("Por favor, insira uma senha.");
+                return;
             }
-        }
 
-        function disponibilizarNumero() {
-            const numero = document.getElementById("inputNumero").value;
-            if (numero && !listaNumeros.includes(numero)) {
-                listaNumeros.push(numero);
-                atualizarLista();
-            } else {
-                alert("Número já foi disponibilizado ou é inválido.");
-            }
+            alert(`Senha adicionada: ${senha}`);
+            document.getElementById("inputSenha").value = ""; // Limpa o campo de senha
         }
 
         function limparLista() {
@@ -200,18 +181,10 @@
             const listaElement = document.getElementById("listaNumeros");
             listaElement.innerHTML = ""; // Limpa a lista
 
-            listaNumeros.forEach((numero, index) => {
+            listaNumeros.forEach((item, index) => {
                 const li = document.createElement("li");
-                li.textContent = numero;
+                li.textContent = `${item.numero} - ${item.nome} - Senha: ${item.senha}`;
 
-                // Adicionar botão de remover
-                const btnRemover = document.createElement("button");
-                btnRemover.textContent = "Remover";
-                btnRemover.classList.add("botao-vermelho");
-                btnRemover.onclick = function() { removerNumero(index); };
-                li.appendChild(btnRemover);
-
-                // Adicionar status de pagamento
                 const btnPagar = document.createElement("button");
                 btnPagar.textContent = "Pago";
                 btnPagar.classList.add("botao-verde");
@@ -222,40 +195,33 @@
                 btnPendente.classList.add("botao-laranja");
                 btnPendente.onclick = function() { mudarStatus(index, "pendente"); };
 
+                const btnRemover = document.createElement("button");
+                btnRemover.textContent = "Remover";
+                btnRemover.classList.add("botao-vermelho");
+                btnRemover.onclick = function() { removerNumero(index); };
+
                 li.appendChild(btnPagar);
                 li.appendChild(btnPendente);
+                li.appendChild(btnRemover);
+
+                if (item.status === "pago") {
+                    li.classList.add("pago");
+                } else {
+                    li.classList.add("pendente");
+                }
+
                 listaElement.appendChild(li);
             });
+        }
+
+        function mudarStatus(index, status) {
+            listaNumeros[index].status = status;
+            atualizarLista();
         }
 
         function removerNumero(index) {
             listaNumeros.splice(index, 1);
             atualizarLista();
-        }
-
-        function mudarStatus(index, status) {
-            const listaElement = document.getElementById("listaNumeros");
-            const li = listaElement.children[index];
-            const icone = document.createElement("span");
-            
-            if (status === "pago") {
-                icone.textContent = "✅";
-                li.classList.add("pago");
-            } else {
-                icone.textContent = "⚠️";
-                li.classList.add("pendente");
-            }
-            li.insertBefore(icone, li.firstChild);
-        }
-
-        function gerarWhatsApp() {
-            if (listaNumeros.length > 0) {
-                const mensagem = encodeURIComponent("Lista de Números:\n" + listaNumeros.join("\n"));
-                const linkWhatsApp = `https://wa.me/?text=${mensagem}`;
-                document.getElementById("whatsappLink").innerHTML = `<a href="${linkWhatsApp}" target="_blank">Clique aqui para enviar a lista no WhatsApp</a>`;
-            } else {
-                alert("Não há números disponíveis para gerar a lista.");
-            }
         }
     </script>
 
