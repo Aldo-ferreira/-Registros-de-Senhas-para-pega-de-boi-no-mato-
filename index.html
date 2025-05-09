@@ -35,7 +35,7 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        input[type="number"], button {
+        input[type="number"], input[type="text"], button {
             padding: 10px;
             margin: 10px;
             border: 1px solid #ddd;
@@ -177,8 +177,13 @@
 
             listaNumeros.forEach((item, index) => {
                 const li = document.createElement("li");
-                li.innerHTML = `Número: ${item.numero} 
-                    <button class="botao-verde" onclick="adicionarNome(${index})">Adicionar Nome</button>
+
+                // Adiciona o número, campos de nome e número, e o botão de cadastro
+                li.innerHTML = `
+                    <span>Número: ${item.numero}</span>
+                    <br>
+                    <input type="text" id="nome_${item.numero}" placeholder="Nome" />
+                    <button class="botao-verde" onclick="cadastrarNome(${index})">Cadastrar</button>
                     <button class="botao-vermelho" onclick="removerNumero(${index})">Remover</button>
                     <span id="nome_${item.numero}">Nome: ${item.nome ? item.nome : "Não atribuído"}</span>
                 `;
@@ -193,8 +198,8 @@
             });
         }
 
-        function adicionarNome(index) {
-            const nome = prompt("Digite o nome para o número " + listaNumeros[index].numero);
+        function cadastrarNome(index) {
+            const nome = document.getElementById(`nome_${listaNumeros[index].numero}`).value;
 
             if (!nome) {
                 alert("Por favor, insira um nome.");
