@@ -383,41 +383,7 @@
         window.addEventListener('offline', atualizarStatusOnline);
         atualizarStatusOnline();
 
-        // Funções de Autenticação
-        function fazerLogin() {
-            const email = document.getElementById('emailLogin').value;
-            const senha = document.getElementById('senhaLogin').value;
-            
-            auth.signInWithEmailAndPassword(email, senha)
-                .then((userCredential) => {
-                    document.getElementById('loginArea').style.display = 'none';
-                    document.getElementById('mainArea').style.display = 'block';
-                })
-                .catch((error) => {
-                    document.getElementById('loginMessage').textContent = 
-                        'Erro no login: ' + error.message;
-                });
-        }
-
-        function fazerLogout() {
-            auth.signOut().then(() => {
-                document.getElementById('loginArea').style.display = 'block';
-                document.getElementById('mainArea').style.display = 'none';
-            });
-        }
-
-        // Verificar estado de autenticação
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                document.getElementById('loginArea').style.display = 'none';
-                document.getElementById('mainArea').style.display = 'block';
-                carregarDados();
-            } else {
-                document.getElementById('loginArea').style.display = 'block';
-                document.getElementById('mainArea').style.display = 'none';
-            }
-        });
-
+       
         // Funções do Firebase
         function carregarDados() {
             database.ref('numeros').on('value', (snapshot) => {
