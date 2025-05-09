@@ -8,7 +8,7 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
 
     <style>
         /* Reset e estilos base */
@@ -293,18 +293,8 @@
 <body>
     <!-- Status Online -->
     <div id="statusOnline"></div>
-
-    <!-- Área de Login -->
-    <div id="loginArea">
-        <h2>Login de Administrador</h2>
-        <input type="email" id="emailLogin" placeholder="Email">
-        <input type="password" id="senhaLogin" placeholder="Senha">
-        <button onclick="fazerLogin()">Entrar</button>
-        <p id="loginMessage"></p>
-    </div>
-
     <!-- Área Principal -->
-    <div id="mainArea" style="display: none;">
+    <div id="mainArea">
         <h1>Sistema Pega de Boi - Online</h1>
         <h3>Escolha seu número e registre seu nome!</h3>
 
