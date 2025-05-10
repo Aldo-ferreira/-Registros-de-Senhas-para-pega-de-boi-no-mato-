@@ -1,205 +1,118 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Senhas e Números</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            text-align: center;
-        }
+  <meta charset="UTF-8" />
+  <title>Sistema de Cadastro Rápido</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f0f0f0;
+      text-align: center;
+    }
 
-        header {
-            background-color: #4CAF50;
-            color: white;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
+    input, button {
+      padding: 10px;
+      margin: 5px;
+      font-size: 16px;
+    }
 
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
+    .lista {
+      margin-top: 20px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+    }
 
-        .container {
-            max-width: 800px;
-            margin: 20px auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
+    .item {
+      padding: 10px;
+      background-color: #fff;
+      margin-bottom: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
 
-        input[type="number"], input[type="text"], button {
-            padding: 10px;
-            margin: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1em;
-        }
+    .item span.nome {
+      font-weight: bold;
+      color: green;
+    }
 
-        button {
-            cursor: pointer;
-        }
-
-        button:hover {
-            opacity: 0.8;
-        }
-
-        .botao-verde {
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        .botao-verde:hover {
-            background-color: #45a049;
-        }
-
-        .botao-azul {
-            background-color: #007BFF;
-            color: white;
-        }
-
-        .botao-azul:hover {
-            background-color: #0056b3;
-        }
-
-        .num-list {
-            list-style: none;
-            padding: 0;
-            margin-top: 20px;
-            text-align: left;
-        }
-
-        .num-list li {
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin: 5px 0;
-            padding: 10px;
-        }
-
-        .pago {
-            color: green;
-            font-weight: bold;
-        }
-
-        .pendente {
-            color: orange;
-            font-weight: bold;
-        }
-
-        footer {
-            background-color: #333;
-            color: white;
-            padding: 10px;
-            margin-top: 20px;
-        }
-    </style>
+    #formularioCadastro {
+      display: none;
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
 
-    <header>
-        <h1>Sistema de Senhas e Lista de Números</h1>
-    </header>
+  <h2>Gerar Lista de Números</h2>
+  <input type="number" id="quantidade" placeholder="Quantidade de Números" />
+  <button onclick="gerarNumeros()">Gerar Lista Numérica</button>
 
-    <div class="container">
-        <h2>Gerar Lista de Números</h2>
-        <input type="number" id="quantidade" placeholder="Quantidade de Números" />
-        <button class="botao-azul" onclick="gerarNumeros()">Gerar Lista Numérica</button>
+  <div id="formularioCadastro">
+    <h3>Cadastrar Nome em um Número</h3>
+    <input type="text" id="nomePessoa" placeholder="Digite o nome..." />
+    <input type="number" id="numeroEscolhido" placeholder="Digite o número..." />
+    <button onclick="cadastrarNome()">Cadastrar</button>
+  </div>
 
-        <div id="formularioCadastro" style="display: none;">
-            <h3>Adicionar Nome ao Número</h3>
-            <input type="number" id="numeroEscolhido" placeholder="Digite o Número" />
-            <input type="text" id="nomePessoa" placeholder="Digite o Nome" />
-            <button class="botao-verde" onclick="cadastrarNome()">Cadastrar Nome</button>
+  <div class="lista" id="listaNumeros"></div>
 
-            <h3>Lista de Números</h3>
-            <ul id="listaNumeros" class="num-list"></ul>
-        </div>
-    </div>
+  <script>
+    const listaNumeros = [];
 
-    <footer>
-        <p>&copy; 2025 Sistema de Senhas - Todos os direitos reservados</p>
-    </footer>
+    function gerarNumeros() {
+      const qtd = parseInt(document.getElementById('quantidade').value);
+      if (!qtd || qtd <= 0) {
+        alert("Digite uma quantidade válida!");
+        return;
+      }
 
-    <script>
-        const listaNumeros = [];
+      listaNumeros.length = 0;
+      for (let i = 1; i <= qtd; i++) {
+        listaNumeros.push({ numero: i, nome: "" });
+      }
 
-        function gerarNumeros() {
-            const quantidade = document.getElementById("quantidade").value;
+      document.getElementById("formularioCadastro").style.display = "block";
+      atualizarLista();
+    }
 
-            if (!quantidade || quantidade <= 0) {
-                alert("Por favor, insira uma quantidade válida de números.");
-                return;
-            }
+    function cadastrarNome() {
+      const nome = document.getElementById('nomePessoa').value.trim();
+      const numero = parseInt(document.getElementById('numeroEscolhido').value);
 
-            // Limpar a lista existente
-            listaNumeros.length = 0;
+      if (!nome || !numero) {
+        alert("Preencha o nome e o número corretamente.");
+        return;
+      }
 
-            // Gerar os números na lista
-            for (let i = 1; i <= quantidade; i++) {
-                listaNumeros.push({ numero: i.toString(), nome: "", status: "pendente" });
-            }
+      const item = listaNumeros.find(e => e.numero === numero);
+      if (!item) {
+        alert("Número não encontrado.");
+        return;
+      }
 
-            // Exibir o formulário para cadastrar nomes
-            document.getElementById("formularioCadastro").style.display = "block";
+      item.nome = nome;
+      atualizarLista();
 
-            // Atualizar a lista exibida na tela
-            atualizarLista();
-        }
+      // Limpar campos para digitar rápido o próximo
+      document.getElementById('nomePessoa').value = "";
+      document.getElementById('numeroEscolhido').value = "";
+      document.getElementById('nomePessoa').focus();
+    }
 
-        function atualizarLista() {
-            const listaElement = document.getElementById("listaNumeros");
-            listaElement.innerHTML = ""; // Limpar a lista
+    function atualizarLista() {
+      const listaDiv = document.getElementById("listaNumeros");
+      listaDiv.innerHTML = "";
 
-            listaNumeros.forEach((item) => {
-                const li = document.createElement("li");
-
-                // Exibir o número e o nome
-                li.innerHTML = `
-                    <span>Número: ${item.numero}</span>
-                    <br>
-                    <span>Nome: ${item.nome ? item.nome : "Não atribuído"}</span>
-                `;
-
-                if (item.status === "pago") {
-                    li.classList.add("pago");
-                } else {
-                    li.classList.add("pendente");
-                }
-
-                listaElement.appendChild(li);
-            });
-        }
-
-        function cadastrarNome() {
-            const numeroEscolhido = document.getElementById("numeroEscolhido").value;
-            const nomePessoa = document.getElementById("nomePessoa").value;
-
-            if (!numeroEscolhido || !nomePessoa) {
-                alert("Por favor, insira o número e o nome.");
-                return;
-            }
-
-            const numeroEncontrado = listaNumeros.find(item => item.numero === numeroEscolhido);
-
-            if (numeroEncontrado) {
-                numeroEncontrado.nome = nomePessoa;
-                numeroEncontrado.status = "pago"; // Marcar como pago
-                alert(`Nome "${nomePessoa}" cadastrado para o número ${numeroEscolhido}.`);
-                // Atualizar a lista
-                atualizarLista();
-            } else {
-                alert("Número não encontrado.");
-            }
-        }
-    </script>
-
+      listaNumeros.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "item";
+        div.innerHTML = `Número ${item.numero}: <span class="nome">${item.nome || "(vazio)"}</span>`;
+        listaDiv.appendChild(div);
+      });
+    }
+  </script>
 </body>
 </html>
