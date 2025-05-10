@@ -2,34 +2,24 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Controle de Números - Estilo Ulmo</title>
+  <title>Sistema de Cadastro com Controles</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #eef2f3;
       padding: 20px;
+      background-color: #f4f4f4;
       text-align: center;
-    }
-
-    h2, h3 {
-      color: #2b2b2b;
     }
 
     input, button {
       padding: 10px;
       margin: 5px;
       font-size: 16px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-
-    button {
-      cursor: pointer;
     }
 
     .lista {
       margin-top: 20px;
-      max-width: 900px;
+      max-width: 800px;
       margin-left: auto;
       margin-right: auto;
     }
@@ -39,23 +29,23 @@
       justify-content: space-between;
       align-items: center;
       background-color: #fff;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 10px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 6px;
+      border-radius: 5px;
       flex-wrap: wrap;
     }
 
     .info {
-      text-align: left;
       flex: 1;
-      min-width: 250px;
-      font-size: 17px;
+      min-width: 200px;
+      text-align: left;
+      font-size: 16px;
     }
 
     .info span.nome {
       font-weight: bold;
-      color: #006400;
+      color: #2b7a0b;
       word-break: break-word;
     }
 
@@ -66,10 +56,11 @@
     }
 
     .botoes button {
+      padding: 5px 10px;
       font-size: 14px;
       border: none;
-      border-radius: 5px;
-      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
     }
 
     .pago {
@@ -95,15 +86,14 @@
 </head>
 <body>
 
-  <h2>Controle de Números</h2>
-
+  <h2>Gerar Lista de Números</h2>
   <input type="number" id="quantidade" placeholder="Quantidade de Números" />
-  <button onclick="gerarNumeros()">Gerar Lista</button>
+  <button onclick="gerarNumeros()">Gerar Lista Numérica</button>
 
   <div id="formularioCadastro">
-    <h3>Cadastrar Nome</h3>
-    <input type="text" id="nomePessoa" placeholder="Nome..." />
-    <input type="number" id="numeroEscolhido" placeholder="Número..." />
+    <h3>Cadastrar Nome em um Número</h3>
+    <input type="text" id="nomePessoa" placeholder="Digite o nome..." />
+    <input type="number" id="numeroEscolhido" placeholder="Digite o número..." />
     <button onclick="cadastrarNome()">Cadastrar</button>
   </div>
 
@@ -115,7 +105,7 @@
     function gerarNumeros() {
       const qtd = parseInt(document.getElementById('quantidade').value);
       if (!qtd || qtd <= 0) {
-        alert("Informe uma quantidade válida.");
+        alert("Digite uma quantidade válida!");
         return;
       }
 
@@ -133,7 +123,7 @@
       const numero = parseInt(document.getElementById('numeroEscolhido').value);
 
       if (!nome || !numero) {
-        alert("Preencha todos os campos.");
+        alert("Preencha o nome e o número corretamente.");
         return;
       }
 
@@ -191,25 +181,25 @@
 
         const info = document.createElement("div");
         info.className = "info";
-        info.innerHTML = `Número ${item.numero}: <span class="nome">${item.nome || "(disponível)"}</span> ${item.pago ? "✅" : ""}`;
+        info.innerHTML = `Número ${item.numero}: <span class="nome">${item.nome || "(vazio)"}</span> ${item.pago ? "✅" : ""}`;
 
         const botoes = document.createElement("div");
         botoes.className = "botoes";
 
         if (item.nome) {
           const btnPago = document.createElement("button");
-          btnPago.className = "pago";
           btnPago.innerText = "Pago ✅";
+          btnPago.className = "pago";
           btnPago.onclick = () => marcarComoPago(item.numero);
 
           const btnEditar = document.createElement("button");
-          btnEditar.className = "editar";
           btnEditar.innerText = "Editar ✏️";
+          btnEditar.className = "editar";
           btnEditar.onclick = () => editarNome(item.numero);
 
           const btnDisponibilizar = document.createElement("button");
-          btnDisponibilizar.className = "disponibilizar";
           btnDisponibilizar.innerText = "Disponibilizar ♻️";
+          btnDisponibilizar.className = "disponibilizar";
           btnDisponibilizar.onclick = () => disponibilizarNumero(item.numero);
 
           botoes.appendChild(btnPago);
