@@ -8,7 +8,7 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
 
     <style>
         /* Reset e estilos base */
@@ -27,46 +27,9 @@
             background-color: #f5f5f5;
         }
 
-        /* Área de Login */
-        #loginArea {
-            max-width: 400px;
-            margin: 50px auto;
-            padding: 20px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
+     
 
-        #loginArea h2 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        #loginArea input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-
-        #loginArea button {
-            width: 100%;
-            padding: 10px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        #loginMessage {
-            color: red;
-            margin-top: 10px;
-            text-align: center;
-        }
-
+    
         /* Estilos de texto */
         h1 {
             font-size: 1.8rem;
@@ -294,14 +257,7 @@
     <!-- Status Online -->
     <div id="statusOnline"></div>
 
-    <!-- Área de Login -->
-    <div id="loginArea">
-        <h2>Login de Administrador</h2>
-        <input type="email" id="emailLogin" placeholder="Email">
-        <input type="password" id="senhaLogin" placeholder="Senha">
-        <button onclick="fazerLogin()">Entrar</button>
-        <p id="loginMessage"></p>
-    </div>
+    
 
     <!-- Área Principal -->
     <div id="mainArea" style="display: none;">
@@ -393,40 +349,9 @@
         window.addEventListener('offline', atualizarStatusOnline);
         atualizarStatusOnline();
 
-        // Funções de Autenticação
-        function fazerLogin() {
-            const email = document.getElementById('emailLogin').value;
-            const senha = document.getElementById('senhaLogin').value;
-            
-            auth.signInWithEmailAndPassword(email, senha)
-                .then((userCredential) => {
-                    document.getElementById('loginArea').style.display = 'none';
-                    document.getElementById('mainArea').style.display = 'block';
-                })
-                .catch((error) => {
-                    document.getElementById('loginMessage').textContent = 
-                        'Erro no login: ' + error.message;
-                });
-        }
+  
 
-        function fazerLogout() {
-            auth.signOut().then(() => {
-                document.getElementById('loginArea').style.display = 'block';
-                document.getElementById('mainArea').style.display = 'none';
-            });
-        }
-
-        // Verificar estado de autenticação
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                document.getElementById('loginArea').style.display = 'none';
-                document.getElementById('mainArea').style.display = 'block';
-                carregarDados();
-            } else {
-                document.getElementById('loginArea').style.display = 'block';
-                document.getElementById('mainArea').style.display = 'none';
-            }
-        });
+     
 
         // Funções do Firebase
         function carregarDados() {
