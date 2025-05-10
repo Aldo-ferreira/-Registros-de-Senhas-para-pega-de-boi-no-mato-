@@ -22,10 +22,18 @@ box-sizing: border-box;
 }
 body {
 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-margin: 0 auto;
-padding: 20px;
-max-width: 1200px;
+margin: 0;
+padding: 0;
 background-color: #f8fafc;
+display: flex;
+justify-content: center;
+min-height: 100vh;
+}
+.container {
+width: 100%;
+max-width: 1200px;
+padding: 20px;
+margin: 0 auto;
 }
 h1 {
 font-size: 2em;
@@ -176,8 +184,19 @@ z-index: 1000;
 .toast.show {
 opacity: 1;
 }
+.card {
+background-color: white;
+border-radius: 8px;
+box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+padding: 24px;
+margin-bottom: 24px;
+}
+.highlight {
+  background-color: #fde68a;
+  padding: 0 2px;
+  border-radius: 2px;
+}
 @media screen and (max-width: 768px) {
-body { margin: 10px; padding: 10px; }
 .form-group { flex-direction: column; align-items: stretch; }
 input, button, #filtroStatus { width: 100%; margin: 5px 0; }
 table { font-size: 0.8em; }
@@ -195,20 +214,15 @@ background-position: right 12px center;
 padding-right: 36px;
 }
 }
-.highlight {
-  background-color: #fde68a;
-  padding: 0 2px;
-  border-radius: 2px;
-}
 </style>
 </head>
-<body class="bg-gray-50">
-<div class="max-w-4xl mx-auto">
+<body>
+<div class="container">
 <header class="mb-8 text-center">
 <h1 class="text-3xl font-bold text-gray-800">Sistema de Senhas - Vaquejadas e Pega de Boi no Mato</h1>
 <h3 class="text-lg text-gray-600">Cada número vale por um boi. Escolha seu número e registre o nome!</h3>
 </header>
-<div class="bg-white p-6 rounded-lg shadow-md mb-6">
+<div class="card">
 <div class="form-group">
 <label for="numero" class="text-gray-700 font-medium">Número:</label>
 <input type="number" id="numero" placeholder="Digite o número" class="border-gray-300 focus:border-indigo-500">
@@ -219,7 +233,7 @@ padding-right: 36px;
 </button>
 </div>
 </div>
-<div class="bg-white p-6 rounded-lg shadow-md mb-6">
+<div class="card">
 <h2 class="text-xl font-semibold text-gray-800 mb-4">Editar Quantidade de Senhas</h2>
 <div class="form-group">
 <label for="quantidadeSenhas" class="text-gray-700 font-medium">Nova quantidade (entre 1 e 1000):</label>
@@ -229,7 +243,7 @@ padding-right: 36px;
 </button>
 </div>
 </div>
-<div class="bg-white p-6 rounded-lg shadow-md mb-6">
+<div class="card">
 <h2 class="text-xl font-semibold text-gray-800 mb-4">Lista de Números Escolhidos</h2>
 <div class="form-group">
 <input type="text" id="buscarNome" placeholder="Buscar por nome..." oninput="filtrarTabela()" class="border-gray-300 focus:border-indigo-500">
@@ -256,7 +270,7 @@ padding-right: 36px;
 <div id="resultCount" class="mt-4 text-sm text-gray-600"></div>
 </div>
 </div>
-<div class="bg-white p-6 rounded-lg shadow-md">
+<div class="card">
 <h2 class="text-xl font-semibold text-gray-800 mb-4">Lista para WhatsApp</h2>
 <div class="flex flex-wrap gap-3 mb-4">
 <button onclick="gerarLista()" class="hover:bg-purple-700">
