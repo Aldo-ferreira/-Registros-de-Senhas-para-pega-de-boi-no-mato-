@@ -2,99 +2,215 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sistema Pega de Boi - Online</title>
-
-  <!-- Firebase SDK apenas para banco de dados -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
-  <!-- TODO: Colar aqui seu <style> completo, mantido como está -->
+  <title>Sistema de Cadastro com Controles</title>
   <style>
-    /* Aqui entra todo o seu CSS que você já enviou, do jeito que está */
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f4f4f4;
+      text-align: center;
+    }
+
+    input, button {
+      padding: 10px;
+      margin: 5px;
+      font-size: 16px;
+    }
+
+    .lista {
+      margin-top: 20px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 6px;
+      border-radius: 5px;
+      flex-wrap: wrap;
+    }
+
+    .info {
+      flex: 1;
+      min-width: 200px;
+      text-align: left;
+      font-size: 16px;
+    }
+
+    .info span.nome {
+      font-weight: bold;
+      color: #2b7a0b;
+      word-break: break-word;
+    }
+
+    .botoes {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .botoes button {
+      padding: 5px 10px;
+      font-size: 14px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .pago {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .editar {
+      background-color: #FFA500;
+      color: white;
+    }
+
+    .disponibilizar {
+      background-color: #f44336;
+      color: white;
+    }
+
+    #formularioCadastro {
+      display: none;
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
-  <!-- Status Online -->
-  <div id="statusOnline"></div>
 
-  <!-- Área Principal SEM LOGIN -->
-  <div id="mainArea">
-    <h1>Sistema Pega de Boi - Online</h1>
-    <h3>Escolha seu número e registre seu nome!</h3>
+  <h2>Gerar Lista de Números</h2>
+  <input type="number" id="quantidade" placeholder="Quantidade de Números" />
+  <button onclick="gerarNumeros()">Gerar Lista Numérica</button>
 
-    <div class="btn-container">
-      <button class="disponibilizar-todo-btn" onclick="disponibilizarTodos()">Disponibilizar Todos</button>
-      <button class="reverter-btn" onclick="reverterDisponibilizacao()">Reverter Disponibilização</button>
-    </div>
-
-    <div class="form-group">
-      <label for="quantidade">Quantidade de Números:</label>
-      <input type="number" id="quantidade" min="1" max="500" value="200" onchange="atualizarQuantidade()">
-    </div>
-
-    <div class="form-group">
-      <label for="numero">Número (1 a <span id="maxNumero">200</span>):</label>
-      <input type="number" id="numero" min="1" placeholder="Digite o número">
-      <label for="nome">Nome:</label>
-      <input type="text" id="nome" placeholder="Digite o nome">
-      <button class="registrar-btn" onclick="registrar()">Registrar</button>
-    </div>
-
-    <!-- Aqui entram outras funcionalidades como a tabela e o WhatsApp -->
-    <div class="form-group table-container">
-      <table id="tabelaNumeros">
-        <!-- Cabeçalho da tabela -->
-      </table>
-    </div>
-
-    <div class="form-group">
-      <h2>Lista para WhatsApp</h2>
-      <textarea id="listaWhatsApp" readonly></textarea>
-      <button class="gerar-btn" onclick="gerarListaWhatsApp()">Gerar Lista</button>
-    </div>
+  <div id="formularioCadastro">
+    <h3>Cadastrar Nome em um Número</h3>
+    <input type="text" id="nomePessoa" placeholder="Digite o nome..." />
+    <input type="number" id="numeroEscolhido" placeholder="Digite o número..." />
+    <button onclick="cadastrarNome()">Cadastrar</button>
   </div>
 
-  <!-- Firebase config e scripts (sem auth) -->
+  <div class="lista" id="listaNumeros"></div>
+
   <script>
-    // TODO: Aqui vai seu código JS completo, sem autenticação
+    const listaNumeros = [];
 
-    // Firebase config (exemplo)
-    var firebaseConfig = {
-      apiKey: "SUA_API_KEY",
-      authDomain: "SEU_DOMINIO.firebaseapp.com",
-      databaseURL: "https://SEU_DATABASE.firebaseio.com",
-      projectId: "SEU_PROJETO_ID",
-      storageBucket: "SEU_BUCKET.appspot.com",
-      messagingSenderId: "ID",
-      appId: "ID"
-    };
+    function gerarNumeros() {
+      const qtd = parseInt(document.getElementById('quantidade').value);
+      if (!qtd || qtd <= 0) {
+        alert("Digite uma quantidade válida!");
+        return;
+      }
 
-    // Inicializar Firebase
-    firebase.initializeApp(firebaseConfig);
-    var database = firebase.database();
+      listaNumeros.length = 0;
+      for (let i = 1; i <= qtd; i++) {
+        listaNumeros.push({ numero: i, nome: "", pago: false });
+      }
 
-    // Exemplo de função
-    function registrar() {
-      // Lógica para registrar número
+      document.getElementById("formularioCadastro").style.display = "block";
+      atualizarLista();
     }
 
-    function gerarListaWhatsApp() {
-      // Lógica para gerar lista
+    function cadastrarNome() {
+      const nome = document.getElementById('nomePessoa').value.trim();
+      const numero = parseInt(document.getElementById('numeroEscolhido').value);
+
+      if (!nome || !numero) {
+        alert("Preencha o nome e o número corretamente.");
+        return;
+      }
+
+      const item = listaNumeros.find(e => e.numero === numero);
+      if (!item) {
+        alert("Número não encontrado.");
+        return;
+      }
+
+      item.nome = nome;
+      item.pago = false;
+      atualizarLista();
+
+      document.getElementById('nomePessoa').value = "";
+      document.getElementById('numeroEscolhido').value = "";
+      document.getElementById('nomePessoa').focus();
     }
 
-    function disponibilizarTodos() {
-      // Lógica para disponibilizar todos
+    function marcarComoPago(numero) {
+      const item = listaNumeros.find(e => e.numero === numero);
+      if (item) {
+        item.pago = true;
+        atualizarLista();
+      }
     }
 
-    function reverterDisponibilizacao() {
-      // Lógica para reverter
+    function editarNome(numero) {
+      const novoNome = prompt("Digite o novo nome:");
+      if (novoNome !== null) {
+        const item = listaNumeros.find(e => e.numero === numero);
+        if (item) {
+          item.nome = novoNome.trim();
+          item.pago = false;
+          atualizarLista();
+        }
+      }
     }
 
-    function atualizarQuantidade() {
-      const max = document.getElementById("quantidade").value;
-      document.getElementById("maxNumero").innerText = max;
-      // Atualizar tabela, etc.
+    function disponibilizarNumero(numero) {
+      const item = listaNumeros.find(e => e.numero === numero);
+      if (item) {
+        item.nome = "";
+        item.pago = false;
+        atualizarLista();
+      }
+    }
+
+    function atualizarLista() {
+      const listaDiv = document.getElementById("listaNumeros");
+      listaDiv.innerHTML = "";
+
+      listaNumeros.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "item";
+
+        const info = document.createElement("div");
+        info.className = "info";
+        info.innerHTML = `Número ${item.numero}: <span class="nome">${item.nome || "(vazio)"}</span> ${item.pago ? "✅" : ""}`;
+
+        const botoes = document.createElement("div");
+        botoes.className = "botoes";
+
+        if (item.nome) {
+          const btnPago = document.createElement("button");
+          btnPago.innerText = "Pago ✅";
+          btnPago.className = "pago";
+          btnPago.onclick = () => marcarComoPago(item.numero);
+
+          const btnEditar = document.createElement("button");
+          btnEditar.innerText = "Editar ✏️";
+          btnEditar.className = "editar";
+          btnEditar.onclick = () => editarNome(item.numero);
+
+          const btnDisponibilizar = document.createElement("button");
+          btnDisponibilizar.innerText = "Disponibilizar ♻️";
+          btnDisponibilizar.className = "disponibilizar";
+          btnDisponibilizar.onclick = () => disponibilizarNumero(item.numero);
+
+          botoes.appendChild(btnPago);
+          botoes.appendChild(btnEditar);
+          botoes.appendChild(btnDisponibilizar);
+        }
+
+        div.appendChild(info);
+        div.appendChild(botoes);
+        listaDiv.appendChild(div);
+      });
     }
   </script>
 </body>
