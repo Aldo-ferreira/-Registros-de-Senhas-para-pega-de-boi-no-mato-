@@ -10,6 +10,10 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         * {
@@ -19,26 +23,31 @@
         }
         
         body { 
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0 auto;
             padding: 20px;
             max-width: 1200px;
-            background-color: #f5f5f5;
+            background-color: #f8fafc;
         }
         
         h1 { 
-            font-size: 1.8em;
+            font-size: 2em;
             text-align: center;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
         }
         
         h2 {
             font-size: 1.5em;
             margin-top: 20px;
+            color: #334155;
         }
         
         h3 {
             font-size: 1.2em;
             text-align: center;
+            color: #475569;
+            margin-bottom: 1.5rem;
         }
 
         .form-group {
@@ -54,155 +63,246 @@
             border-collapse: collapse; 
             margin-top: 20px;
             font-size: 0.9em;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             background: white;
-            border-radius: 4px;
+            border-radius: 8px;
             overflow: hidden;
         }
         
         th, td { 
-            border: 1px solid #ddd; 
-            padding: 8px; 
+            border: 1px solid #e2e8f0; 
+            padding: 12px; 
             text-align: center; 
         }
         
         th { 
-            background-color: #f4f4f4; 
+            background-color: #f1f5f9; 
+            font-weight: 600;
+            color: #334155;
         }
         
         input { 
-            padding: 8px; 
+            padding: 10px; 
             margin: 5px 0; 
-            border: 1px solid #ddd; 
-            border-radius: 4px;
+            border: 1px solid #cbd5e1; 
+            border-radius: 6px;
             flex: 1;
             min-width: 120px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
         }
         
         button { 
-            padding: 8px 15px; 
+            padding: 10px 16px; 
             margin: 5px 2px; 
             cursor: pointer; 
             border: none; 
-            border-radius: 4px; 
-            font-weight: bold; 
+            border-radius: 6px; 
+            font-weight: 600; 
             transition: all 0.3s ease;
             white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         
         button:hover { 
-            opacity: 0.9; 
+            transform: translateY(-1px); 
         }
         
         .pago { 
-            color: #4CAF50; 
+            color: #10b981; 
             font-weight: bold; 
         }
         
         #listaWhatsApp { 
             width: 100%; 
             margin-top: 10px; 
-            padding: 10px; 
-            border: 1px solid #ddd; 
-            border-radius: 4px; 
+            padding: 12px; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 8px; 
             height: 200px;
+            font-family: monospace;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        #listaWhatsApp:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
         }
 
         #filtroStatus {
-            padding: 8px;
+            padding: 10px;
             margin: 5px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: #673ab7;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            background-color: #4f46e5;
             color: white;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 600;
             min-width: 120px;
+            transition: all 0.3s;
+        }
+
+        #filtroStatus:hover {
+            background-color: #4338ca;
         }
 
         #filtroStatus option {
             background-color: white;
-            color: black;
+            color: #1e293b;
             padding: 8px;
         }
 
-        /* Cores dos botões */
-        button[onclick="registrar()"] { background-color: #4CAF50; color: white; }
-        button[onclick="atualizarQuantidadeSenhas()"] { background-color: #ff9800; color: white; }
-        button[onclick="gerarLista()"] { background-color: #9c27b0; color: white; }
-        button[onclick="limparLista()"] { background-color: #f44336; color: white; }
-        button[onclick^="marcarPago"] { background-color: #4CAF50; color: white; padding: 5px 10px; font-size: 0.9em; }
-        button[onclick^="editar"] { background-color: #2196F3; color: white; padding: 5px 10px; font-size: 0.9em; }
-        button[onclick^="disponibilizar"] { background-color: #ff9800; color: white; padding: 5px 10px; font-size: 0.9em; }
+        /* Button colors */
+        button[onclick="registrar()"] { background-color: #10b981; color: white; }
+        button[onclick="atualizarQuantidadeSenhas()"] { background-color: #f59e0b; color: white; }
+        button[onclick="gerarLista()"] { background-color: #8b5cf6; color: white; }
+        button[onclick="copiarLista()"] { background-color: #3b82f6; color: white; }
+        button[onclick="limparLista()"] { background-color: #ef4444; color: white; }
+        button[onclick^="marcarPago"] { background-color: #10b981; color: white; padding: 8px 12px; font-size: 0.9em; }
+        button[onclick^="editar"] { background-color: #3b82f6; color: white; padding: 8px 12px; font-size: 0.9em; }
+        button[onclick^="disponibilizar"] { background-color: #f59e0b; color: white; padding: 8px 12px; font-size: 0.9em; }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #10b981;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
 
         @media screen and (max-width: 768px) {
             body { margin: 10px; padding: 10px; }
             .form-group { flex-direction: column; align-items: stretch; }
             input, button, #filtroStatus { width: 100%; margin: 5px 0; }
             table { font-size: 0.8em; }
-            td button { margin: 2px; padding: 5px; font-size: 0.8em; width: auto; }
+            .action-buttons { flex-direction: column; gap: 6px; }
+            td button { margin: 2px; padding: 6px; font-size: 0.8em; width: auto; }
         }
 
         @supports (-webkit-appearance: none) or (-moz-appearance: none) {
             select {
                 -webkit-appearance: none;
                 -moz-appearance: none;
+                appearance: none;
                 background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
                 background-repeat: no-repeat;
-                background-position: right 8px center;
-                padding-right: 30px;
+                background-position: right 12px center;
+                padding-right: 36px;
             }
         }
     </style>
 </head>
-<body>
-    <h1>Escolha de Números - Pega de Boi</h1>
-    <h3>Cada número vale por um boi. Escolha seu número e registre seu nome!</h3>
+<body class="bg-gray-50">
+    <div class="max-w-4xl mx-auto">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-bold text-gray-800">Sistema de Senhas - Vaquejadas e Pega de Boi no Mato</h1>
+            <h3 class="text-lg text-gray-600">Cada número vale por um boi. Escolha seu número e registre o nome!</h3>
+        </header>
 
-    <div class="form-group">
-        <label for="numero">Número:</label>
-        <input type="number" id="numero" placeholder="Digite o número">
-        <label for="nome">Seu Nome:</label>
-        <input type="text" id="nome" placeholder="Digite seu nome">
-        <button onclick="registrar()">Registrar</button>
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <div class="form-group">
+                <label for="numero" class="text-gray-700 font-medium">Número:</label>
+                <input type="number" id="numero" placeholder="Digite o número" class="border-gray-300 focus:border-indigo-500">
+                <label for="nome" class="text-gray-700 font-medium">Seu Nome:</label>
+                <input type="text" id="nome" placeholder="Digite seu nome" class="border-gray-300 focus:border-indigo-500">
+                <button onclick="registrar()">
+                    <i class="fas fa-check-circle"></i> Registrar
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Editar Quantidade de Senhas</h2>
+            <div class="form-group">
+                <label for="quantidadeSenhas" class="text-gray-700 font-medium">Nova quantidade (entre 1 e 1000):</label>
+                <input type="number" id="quantidadeSenhas" min="1" max="1000" placeholder="Ex: 200" class="border-gray-300 focus:border-indigo-500">
+                <button onclick="atualizarQuantidadeSenhas()">
+                    <i class="fas fa-sync-alt"></i> Atualizar Quantidade
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Lista de Números Escolhidos</h2>
+            <div class="form-group">
+                <input type="text" id="buscarNome" placeholder="Buscar por nome..." oninput="filtrarTabela()" class="border-gray-300 focus:border-indigo-500">
+                <input type="number" id="buscarNumero" placeholder="Buscar por número..." oninput="filtrarTabela()" class="border-gray-300 focus:border-indigo-500">
+                <select id="filtroStatus" onchange="filtrarTabela()">
+                    <option value="todos">Todos os Status</option>
+                    <option value="disponivel">Disponíveis</option>
+                    <option value="pendente">Pendentes</option>
+                    <option value="pago">Pagos</option>
+                </select>
+            </div>
+            <div class="overflow-x-auto">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Número</th>
+                            <th>Nome</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Lista para WhatsApp</h2>
+            <div class="flex flex-wrap gap-3 mb-4">
+                <button onclick="gerarLista()" class="hover:bg-purple-700">
+                    <i class="fas fa-list"></i> Gerar Lista
+                </button>
+                <button onclick="copiarLista()" class="hover:bg-blue-700" id="copyButton">
+                    <i class="far fa-copy"></i> Copiar Lista
+                </button>
+                <button onclick="limparLista()" class="hover:bg-red-700">
+                    <i class="fas fa-trash-alt"></i> Limpar Lista
+                </button>
+            </div>
+            <textarea id="listaWhatsApp" placeholder="Lista gerada aparecerá aqui..." readonly></textarea>
+        </div>
     </div>
 
-    <h2>Editar Quantidade de Senhas</h2>
-    <div class="form-group">
-        <label for="quantidadeSenhas">Nova quantidade (entre 1 e 1000):</label>
-        <input type="number" id="quantidadeSenhas" min="1" max="1000" placeholder="Ex: 200">
-        <button onclick="atualizarQuantidadeSenhas()">Atualizar Quantidade de Senhas</button>
+    <div id="toast" class="toast">
+        <i class="fas fa-check-circle"></i>
+        <span>Lista copiada para a área de transferência!</span>
     </div>
-
-    <h2>Lista de Números Escolhidos</h2>
-    <div class="form-group">
-        <input type="text" id="buscarNome" placeholder="Buscar por nome..." oninput="filtrarTabela()">
-        <input type="number" id="buscarNumero" placeholder="Buscar por número..." oninput="filtrarTabela()">
-        <select id="filtroStatus" onchange="filtrarTabela()">
-            <option value="todos">Todos os Status</option>
-            <option value="disponivel">Disponíveis</option>
-            <option value="pendente">Pendentes</option>
-            <option value="pago">Pagos</option>
-        </select>
-    </div>
-    <table>
-        <thead>
-            <tr>
-                <th>Número</th>
-                <th>Nome</th>
-                <th>Status</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody id="tabela"></tbody>
-    </table>
-
-    <button onclick="gerarLista()">Gerar Lista para WhatsApp</button>
-    <textarea id="listaWhatsApp" placeholder="Lista gerada aparecerá aqui..." readonly></textarea>
-    <button onclick="limparLista()">Limpar Lista</button>
 
     <script>
-        // Configuração do Firebase
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBQpSLAAcLAGcv25sjFmHAQ30qysN2jv2U",
             authDomain: "pega-de-boi-b179c.firebaseapp.com",
@@ -213,19 +313,19 @@
             databaseURL: "https://pega-de-boi-b179c-default-rtdb.firebaseio.com"
         };
 
-        // Inicializar Firebase
+        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const numerosRef = database.ref('numeros');
         
         let numeros = [];
 
-        // Carregar dados iniciais
+        // Load initial data
         numerosRef.once('value').then((snapshot) => {
             if (snapshot.exists()) {
                 numeros = snapshot.val();
             } else {
-                // Se não existir dados, criar lista inicial com 50 números
+                // If no data exists, create initial list with 50 numbers
                 numeros = Array.from({ length: 50 }, (_, i) => ({ 
                     numero: i + 1, 
                     nome: '', 
@@ -235,15 +335,15 @@
             }
             atualizarTabela();
         }).catch(error => {
-            console.error("Erro ao carregar dados:", error);
+            console.error("Error loading data:", error);
             alert("Erro ao carregar dados. Por favor, recarregue a página.");
         });
 
-        // Ouvir mudanças em tempo real
+        // Listen for real-time changes
         numerosRef.on('value', (snapshot) => {
             if (snapshot.exists()) {
                 numeros = snapshot.val();
-                filtrarTabela(); // Atualiza a interface quando houver mudanças
+                filtrarTabela(); // Update UI when changes occur
             }
         });
 
@@ -252,7 +352,7 @@
                 numerosRef.set(numeros);
             } catch (erro) {
                 alert('Erro ao salvar os dados. Por favor, tente novamente.');
-                console.error('Erro ao salvar:', erro);
+                console.error('Save error:', erro);
             }
         }
 
@@ -321,21 +421,62 @@
                 ...numeros.map(item => {
                     let status = '';
                     if (item.nome) {
-                        status = item.pago ? '✅' : '⌛';
+                        status = item.pago ? '✅ Pago' : '⌛ Pendente';
                     } else {
-                        status = 'Disponível';
+                        status = '🟢 Disponível';
                     }
-                    return `${item.numero} | ${item.nome || 'Disponível'} ${status}`
+                    return `${item.numero} | ${item.nome || '---'} | ${status}`
                 })
             ];
             const textoLista = lista.join('\n');
             document.getElementById('listaWhatsApp').value = textoLista;
         }
 
+        function copiarLista() {
+            const lista = document.getElementById('listaWhatsApp');
+            
+            if (!lista.value) {
+                alert('Gere a lista primeiro antes de copiar.');
+                return;
+            }
+            
+            lista.select();
+            lista.setSelectionRange(0, 99999); // For mobile devices
+            
+            try {
+                navigator.clipboard.writeText(lista.value).then(() => {
+                    showToast();
+                }).catch(err => {
+                    console.error('Copy error: ', err);
+                    alert('Erro ao copiar. Tente novamente.');
+                });
+            } catch (err) {
+                // Fallback for older browsers
+                try {
+                    document.execCommand('copy');
+                    showToast();
+                } catch (err) {
+                    console.error('Copy error: ', err);
+                    alert('Erro ao copiar. Tente novamente.');
+                }
+            }
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
         function limparLista() {
-            numeros = [];
-            atualizarTabela();
-            document.getElementById('listaWhatsApp').value = '';
+            if (confirm('Tem certeza que deseja limpar todos os números? Esta ação não pode ser desfeita.')) {
+                numeros = [];
+                atualizarTabela();
+                document.getElementById('listaWhatsApp').value = '';
+            }
         }
 
         function atualizarQuantidadeSenhas() {
@@ -346,14 +487,14 @@
                 return;
             }
 
-            // Criar nova lista com a quantidade desejada
+            // Create new list with desired quantity
             const novaLista = Array.from({ length: novaQuantidade }, (_, i) => ({
                 numero: i + 1,
                 nome: '',
                 pago: false
             }));
 
-            // Atualizar a lista no Firebase
+            // Update list in Firebase
             numerosRef.set(novaLista)
                 .then(() => {
                     numeros = novaLista;
@@ -362,7 +503,7 @@
                     document.getElementById('quantidadeSenhas').value = '';
                 })
                 .catch(error => {
-                    console.error("Erro ao atualizar quantidade:", error);
+                    console.error("Error updating quantity:", error);
                     alert("Erro ao atualizar quantidade. Por favor, tente novamente.");
                 });
         }
@@ -378,7 +519,12 @@
             let dadosFiltrados = numeros;
 
             if (filtroStatus !== 'todos') {
-                dadosFiltrados = dadosFiltrados.filter(item => item.pago === (filtroStatus === 'pago'));
+                dadosFiltrados = dadosFiltrados.filter(item => {
+                    if (filtroStatus === 'disponivel') return !item.nome;
+                    if (filtroStatus === 'pendente') return item.nome && !item.pago;
+                    if (filtroStatus === 'pago') return item.pago;
+                    return true;
+                });
             }
 
             if (buscarNome || buscarNumero) {
@@ -394,11 +540,19 @@
                 row.innerHTML = `
                     <td>${item.numero}</td>
                     <td>${item.nome || 'Disponível'}</td>
-                    <td>${item.pago ? 'Pago' : 'Pendente'}</td>
+                    <td>${item.pago ? '<span class="pago">Pago</span>' : item.nome ? 'Pendente' : 'Disponível'}</td>
                     <td>
-                        <button onclick="marcarPago(${item.numero})">${item.pago ? 'Marcar como pendente' : 'Marcar como pago'}</button>
-                        <button onclick="editar(${item.numero})">Editar</button>
-                        <button onclick="disponibilizar(${item.numero})">Disponibilizar</button>
+                        <div class="action-buttons">
+                            <button onclick="marcarPago(${item.numero})">
+                                <i class="fas ${item.pago ? 'fa-times-circle' : 'fa-check-circle'}"></i> ${item.pago ? 'Pendente' : 'Pago'}
+                            </button>
+                            <button onclick="editar(${item.numero})">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                            <button onclick="disponibilizar(${item.numero})">
+                                <i class="fas fa-unlock"></i> Liberar
+                            </button>
+                        </div>
                     </td>
                 `;
                 tabela.appendChild(row);
