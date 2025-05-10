@@ -2,12 +2,12 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Sistema de Cadastro Rápido</title>
+  <title>Sistema de Cadastro com Controles</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
-      background-color: #f0f0f0;
+      background-color: #f4f4f4;
       text-align: center;
     }
 
@@ -19,23 +19,63 @@
 
     .lista {
       margin-top: 20px;
-      max-width: 500px;
+      max-width: 800px;
       margin-left: auto;
       margin-right: auto;
-      text-align: left;
     }
 
     .item {
-      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       background-color: #fff;
-      margin-bottom: 5px;
       border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 6px;
       border-radius: 5px;
+      flex-wrap: wrap;
     }
 
-    .item span.nome {
+    .info {
+      flex: 1;
+      min-width: 200px;
+      text-align: left;
+      font-size: 16px;
+    }
+
+    .info span.nome {
       font-weight: bold;
-      color: green;
+      color: #2b7a0b;
+      word-break: break-word;
+    }
+
+    .botoes {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .botoes button {
+      padding: 5px 10px;
+      font-size: 14px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .pago {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .editar {
+      background-color: #FFA500;
+      color: white;
+    }
+
+    .disponibilizar {
+      background-color: #f44336;
+      color: white;
     }
 
     #formularioCadastro {
@@ -71,7 +111,7 @@
 
       listaNumeros.length = 0;
       for (let i = 1; i <= qtd; i++) {
-        listaNumeros.push({ numero: i, nome: "" });
+        listaNumeros.push({ numero: i, nome: "", pago: false });
       }
 
       document.getElementById("formularioCadastro").style.display = "block";
@@ -94,12 +134,41 @@
       }
 
       item.nome = nome;
+      item.pago = false;
       atualizarLista();
 
-      // Limpar campos para digitar rápido o próximo
       document.getElementById('nomePessoa').value = "";
       document.getElementById('numeroEscolhido').value = "";
       document.getElementById('nomePessoa').focus();
+    }
+
+    function marcarComoPago(numero) {
+      const item = listaNumeros.find(e => e.numero === numero);
+      if (item) {
+        item.pago = true;
+        atualizarLista();
+      }
+    }
+
+    function editarNome(numero) {
+      const novoNome = prompt("Digite o novo nome:");
+      if (novoNome !== null) {
+        const item = listaNumeros.find(e => e.numero === numero);
+        if (item) {
+          item.nome = novoNome.trim();
+          item.pago = false;
+          atualizarLista();
+        }
+      }
+    }
+
+    function disponibilizarNumero(numero) {
+      const item = listaNumeros.find(e => e.numero === numero);
+      if (item) {
+        item.nome = "";
+        item.pago = false;
+        atualizarLista();
+      }
     }
 
     function atualizarLista() {
@@ -109,7 +178,37 @@
       listaNumeros.forEach(item => {
         const div = document.createElement("div");
         div.className = "item";
-        div.innerHTML = `Número ${item.numero}: <span class="nome">${item.nome || "(vazio)"}</span>`;
+
+        const info = document.createElement("div");
+        info.className = "info";
+        info.innerHTML = `Número ${item.numero}: <span class="nome">${item.nome || "(vazio)"}</span> ${item.pago ? "✅" : ""}`;
+
+        const botoes = document.createElement("div");
+        botoes.className = "botoes";
+
+        if (item.nome) {
+          const btnPago = document.createElement("button");
+          btnPago.innerText = "Pago ✅";
+          btnPago.className = "pago";
+          btnPago.onclick = () => marcarComoPago(item.numero);
+
+          const btnEditar = document.createElement("button");
+          btnEditar.innerText = "Editar ✏️";
+          btnEditar.className = "editar";
+          btnEditar.onclick = () => editarNome(item.numero);
+
+          const btnDisponibilizar = document.createElement("button");
+          btnDisponibilizar.innerText = "Disponibilizar ♻️";
+          btnDisponibilizar.className = "disponibilizar";
+          btnDisponibilizar.onclick = () => disponibilizarNumero(item.numero);
+
+          botoes.appendChild(btnPago);
+          botoes.appendChild(btnEditar);
+          botoes.appendChild(btnDisponibilizar);
+        }
+
+        div.appendChild(info);
+        div.appendChild(botoes);
         listaDiv.appendChild(div);
       });
     }
