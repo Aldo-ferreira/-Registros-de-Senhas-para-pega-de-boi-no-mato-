@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <title>Sistema de Cadastro com Controles</title>
+  <meta charset="UTF-8">
+  <title>Sistema de Cadastro de Nomes</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 20px;
       background-color: #f4f4f4;
+      padding: 20px;
       text-align: center;
     }
 
@@ -25,28 +25,25 @@
     }
 
     .item {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      padding: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background-color: #fff;
-      border: 1px solid #ccc;
-      padding: 10px;
-      margin-bottom: 6px;
-      border-radius: 5px;
       flex-wrap: wrap;
     }
 
     .info {
       flex: 1;
-      min-width: 200px;
       text-align: left;
-      font-size: 16px;
     }
 
     .info span.nome {
       font-weight: bold;
       color: #2b7a0b;
-      word-break: break-word;
     }
 
     .botoes {
@@ -56,27 +53,17 @@
     }
 
     .botoes button {
-      padding: 5px 10px;
-      font-size: 14px;
       border: none;
       border-radius: 4px;
+      padding: 5px 10px;
+      font-size: 14px;
       cursor: pointer;
-    }
-
-    .pago {
-      background-color: #4CAF50;
       color: white;
     }
 
-    .editar {
-      background-color: #FFA500;
-      color: white;
-    }
-
-    .disponibilizar {
-      background-color: #f44336;
-      color: white;
-    }
+    .pago { background-color: #4CAF50; }
+    .editar { background-color: #FFA500; }
+    .disponibilizar { background-color: #f44336; }
 
     #formularioCadastro {
       display: none;
@@ -88,46 +75,46 @@
 
   <h2>Gerar Lista de Números</h2>
   <input type="number" id="quantidade" placeholder="Quantidade de Números" />
-  <button onclick="gerarNumeros()">Gerar Lista Numérica</button>
+  <button onclick="gerarLista()">Gerar</button>
 
   <div id="formularioCadastro">
-    <h3>Cadastrar Nome em um Número</h3>
-    <input type="text" id="nomePessoa" placeholder="Digite o nome..." />
-    <input type="number" id="numeroEscolhido" placeholder="Digite o número..." />
-    <button onclick="cadastrarNome()">Cadastrar</button>
+    <h3>Cadastro</h3>
+    <input type="text" id="nome" placeholder="Nome" />
+    <input type="number" id="numero" placeholder="Número" />
+    <button onclick="cadastrar()">Cadastrar</button>
   </div>
 
-  <div class="lista" id="listaNumeros"></div>
+  <div class="lista" id="lista"></div>
 
   <script>
-    const listaNumeros = [];
+    let lista = [];
 
-    function gerarNumeros() {
-      const qtd = parseInt(document.getElementById('quantidade').value);
+    function gerarLista() {
+      const qtd = parseInt(document.getElementById("quantidade").value);
       if (!qtd || qtd <= 0) {
-        alert("Digite uma quantidade válida!");
+        alert("Digite uma quantidade válida.");
         return;
       }
 
-      listaNumeros.length = 0;
+      lista = [];
       for (let i = 1; i <= qtd; i++) {
-        listaNumeros.push({ numero: i, nome: "", pago: false });
+        lista.push({ numero: i, nome: "", pago: false });
       }
 
       document.getElementById("formularioCadastro").style.display = "block";
-      atualizarLista();
+      atualizar();
     }
 
-    function cadastrarNome() {
-      const nome = document.getElementById('nomePessoa').value.trim();
-      const numero = parseInt(document.getElementById('numeroEscolhido').value);
+    function cadastrar() {
+      const nome = document.getElementById("nome").value.trim();
+      const numero = parseInt(document.getElementById("numero").value);
 
-      if (!nome || !numero) {
-        alert("Preencha o nome e o número corretamente.");
+      if (!nome || isNaN(numero)) {
+        alert("Preencha todos os campos corretamente.");
         return;
       }
 
-      const item = listaNumeros.find(e => e.numero === numero);
+      const item = lista.find(e => e.numero === numero);
       if (!item) {
         alert("Número não encontrado.");
         return;
@@ -135,47 +122,46 @@
 
       item.nome = nome;
       item.pago = false;
-      atualizarLista();
 
-      document.getElementById('nomePessoa').value = "";
-      document.getElementById('numeroEscolhido').value = "";
-      document.getElementById('nomePessoa').focus();
+      document.getElementById("nome").value = "";
+      document.getElementById("numero").value = "";
+      atualizar();
     }
 
-    function marcarComoPago(numero) {
-      const item = listaNumeros.find(e => e.numero === numero);
+    function marcarPago(numero) {
+      const item = lista.find(e => e.numero === numero);
       if (item) {
         item.pago = true;
-        atualizarLista();
+        atualizar();
       }
     }
 
-    function editarNome(numero) {
+    function editar(numero) {
       const novoNome = prompt("Digite o novo nome:");
       if (novoNome !== null) {
-        const item = listaNumeros.find(e => e.numero === numero);
+        const item = lista.find(e => e.numero === numero);
         if (item) {
           item.nome = novoNome.trim();
           item.pago = false;
-          atualizarLista();
+          atualizar();
         }
       }
     }
 
-    function disponibilizarNumero(numero) {
-      const item = listaNumeros.find(e => e.numero === numero);
+    function disponibilizar(numero) {
+      const item = lista.find(e => e.numero === numero);
       if (item) {
         item.nome = "";
         item.pago = false;
-        atualizarLista();
+        atualizar();
       }
     }
 
-    function atualizarLista() {
-      const listaDiv = document.getElementById("listaNumeros");
+    function atualizar() {
+      const listaDiv = document.getElementById("lista");
       listaDiv.innerHTML = "";
 
-      listaNumeros.forEach(item => {
+      lista.forEach(item => {
         const div = document.createElement("div");
         div.className = "item";
 
@@ -188,23 +174,23 @@
 
         if (item.nome) {
           const btnPago = document.createElement("button");
-          btnPago.innerText = "Pago ✅";
           btnPago.className = "pago";
-          btnPago.onclick = () => marcarComoPago(item.numero);
+          btnPago.textContent = "Pago ✅";
+          btnPago.onclick = () => marcarPago(item.numero);
 
           const btnEditar = document.createElement("button");
-          btnEditar.innerText = "Editar ✏️";
           btnEditar.className = "editar";
-          btnEditar.onclick = () => editarNome(item.numero);
+          btnEditar.textContent = "Editar ✏️";
+          btnEditar.onclick = () => editar(item.numero);
 
-          const btnDisponibilizar = document.createElement("button");
-          btnDisponibilizar.innerText = "Disponibilizar ♻️";
-          btnDisponibilizar.className = "disponibilizar";
-          btnDisponibilizar.onclick = () => disponibilizarNumero(item.numero);
+          const btnDisp = document.createElement("button");
+          btnDisp.className = "disponibilizar";
+          btnDisp.textContent = "Disponibilizar ♻️";
+          btnDisp.onclick = () => disponibilizar(item.numero);
 
           botoes.appendChild(btnPago);
           botoes.appendChild(btnEditar);
-          botoes.appendChild(btnDisponibilizar);
+          botoes.appendChild(btnDisp);
         }
 
         div.appendChild(info);
