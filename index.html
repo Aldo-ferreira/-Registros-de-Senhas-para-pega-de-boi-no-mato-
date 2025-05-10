@@ -1,217 +1,278 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <title>Sistema de Cadastro com Controles</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background-color: #f4f4f4;
-      text-align: center;
-    }
+    <meta charset="UTF-8">
+    <title>Sistema de Cadastro Online</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
 
-    input, button {
-      padding: 10px;
-      margin: 5px;
-      font-size: 16px;
-    }
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            font-size: 16px;
+        }
 
-    .lista {
-      margin-top: 20px;
-      max-width: 800px;
-      margin-left: auto;
-      margin-right: auto;
-    }
+        .lista {
+            margin-top: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
 
-    .item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: #fff;
-      border: 1px solid #ccc;
-      padding: 10px;
-      margin-bottom: 6px;
-      border-radius: 5px;
-      flex-wrap: wrap;
-    }
+        .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 6px;
+            border-radius: 5px;
+            flex-wrap: wrap;
+        }
 
-    .info {
-      flex: 1;
-      min-width: 200px;
-      text-align: left;
-      font-size: 16px;
-    }
+        .info {
+            flex: 1;
+            min-width: 200px;
+            text-align: left;
+            font-size: 16px;
+        }
 
-    .info span.nome {
-      font-weight: bold;
-      color: #2b7a0b;
-      word-break: break-word;
-    }
+        .info span.nome {
+            font-weight: bold;
+            color: #2b7a0b;
+            word-break: break-word;
+        }
 
-    .botoes {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
+        .botoes {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
 
-    .botoes button {
-      padding: 5px 10px;
-      font-size: 14px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
+        .botoes button {
+            padding: 5px 10px;
+            font-size: 14px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
 
-    .pago {
-      background-color: #4CAF50;
-      color: white;
-    }
+        .pago {
+            background-color: #4CAF50;
+            color: white;
+        }
 
-    .editar {
-      background-color: #FFA500;
-      color: white;
-    }
+        .editar {
+            background-color: #FFA500;
+            color: white;
+        }
 
-    .disponibilizar {
-      background-color: #f44336;
-      color: white;
-    }
+        .disponibilizar {
+            background-color: #f44336;
+            color: white;
+        }
 
-    #formularioCadastro {
-      display: none;
-      margin-top: 20px;
-    }
-  </style>
+        #formularioCadastro {
+            margin-top: 20px;
+        }
+
+        #listaWhatsApp {
+            width: 100%;
+            height: 200px;
+            margin: 20px 0;
+            padding: 10px;
+        }
+    </style>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 </head>
 <body>
 
-  <h2>Gerar Lista de Números</h2>
-  <input type="number" id="quantidade" placeholder="Quantidade de Números" />
-  <button onclick="gerarNumeros()">Gerar Lista Numérica</button>
+    <h2>Sistema de Cadastro Online</h2>
+    
+    <div class="btn-container">
+        <button onclick="disponibilizarTodos()" style="background-color: #007bff">Disponibilizar Todos</button>
+        <button onclick="reverterDisponibilizacao()" style="background-color: #fd7e14">Reverter Disponibilização</button>
+    </div>
 
-  <div id="formularioCadastro">
-    <h3>Cadastrar Nome em um Número</h3>
-    <input type="text" id="nomePessoa" placeholder="Digite o nome..." />
-    <input type="number" id="numeroEscolhido" placeholder="Digite o número..." />
-    <button onclick="cadastrarNome()">Cadastrar</button>
-  </div>
+    <div id="formularioCadastro">
+        <input type="number" id="quantidade" placeholder="Quantidade de Números" />
+        <button onclick="inicializarSistema()">Gerar Lista</button>
+        
+        <h3>Cadastrar Nome</h3>
+        <input type="number" id="numero" placeholder="Número" />
+        <input type="text" id="nome" placeholder="Nome" />
+        <button onclick="registrar()">Cadastrar</button>
+    </div>
 
-  <div class="lista" id="listaNumeros"></div>
+    <div class="lista" id="listaNumeros"></div>
 
-  <script>
-    const listaNumeros = [];
+    <div>
+        <button onclick="gerarLista()" style="background-color: #17a2b8">Gerar Lista WhatsApp</button>
+        <textarea id="listaWhatsApp" placeholder="Lista gerada aparecerá aqui..." readonly></textarea>
+    </div>
 
-    function gerarNumeros() {
-      const qtd = parseInt(document.getElementById('quantidade').value);
-      if (!qtd || qtd <= 0) {
-        alert("Digite uma quantidade válida!");
-        return;
-      }
+    <script>
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "SUA-API-KEY",
+            authDomain: "seu-projeto.firebaseapp.com",
+            databaseURL: "https://seu-projeto.firebaseio.com",
+            projectId: "seu-projeto",
+            storageBucket: "seu-projeto.appspot.com",
+            messagingSenderId: "seu-messaging-id",
+            appId: "seu-app-id"
+        };
 
-      listaNumeros.length = 0;
-      for (let i = 1; i <= qtd; i++) {
-        listaNumeros.push({ numero: i, nome: "", pago: false });
-      }
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
 
-      document.getElementById("formularioCadastro").style.display = "block";
-      atualizarLista();
-    }
+        let numeros = [];
+        let backupNumeros = [];
 
-    function cadastrarNome() {
-      const nome = document.getElementById('nomePessoa').value.trim();
-      const numero = parseInt(document.getElementById('numeroEscolhido').value);
-
-      if (!nome || !numero) {
-        alert("Preencha o nome e o número corretamente.");
-        return;
-      }
-
-      const item = listaNumeros.find(e => e.numero === numero);
-      if (!item) {
-        alert("Número não encontrado.");
-        return;
-      }
-
-      item.nome = nome;
-      item.pago = false;
-      atualizarLista();
-
-      document.getElementById('nomePessoa').value = "";
-      document.getElementById('numeroEscolhido').value = "";
-      document.getElementById('nomePessoa').focus();
-    }
-
-    function marcarComoPago(numero) {
-      const item = listaNumeros.find(e => e.numero === numero);
-      if (item) {
-        item.pago = true;
-        atualizarLista();
-      }
-    }
-
-    function editarNome(numero) {
-      const novoNome = prompt("Digite o novo nome:");
-      if (novoNome !== null) {
-        const item = listaNumeros.find(e => e.numero === numero);
-        if (item) {
-          item.nome = novoNome.trim();
-          item.pago = false;
-          atualizarLista();
-        }
-      }
-    }
-
-    function disponibilizarNumero(numero) {
-      const item = listaNumeros.find(e => e.numero === numero);
-      if (item) {
-        item.nome = "";
-        item.pago = false;
-        atualizarLista();
-      }
-    }
-
-    function atualizarLista() {
-      const listaDiv = document.getElementById("listaNumeros");
-      listaDiv.innerHTML = "";
-
-      listaNumeros.forEach(item => {
-        const div = document.createElement("div");
-        div.className = "item";
-
-        const info = document.createElement("div");
-        info.className = "info";
-        info.innerHTML = `Número ${item.numero}: <span class="nome">${item.nome || "(vazio)"}</span> ${item.pago ? "✅" : ""}`;
-
-        const botoes = document.createElement("div");
-        botoes.className = "botoes";
-
-        if (item.nome) {
-          const btnPago = document.createElement("button");
-          btnPago.innerText = "Pago ✅";
-          btnPago.className = "pago";
-          btnPago.onclick = () => marcarComoPago(item.numero);
-
-          const btnEditar = document.createElement("button");
-          btnEditar.innerText = "Editar ✏️";
-          btnEditar.className = "editar";
-          btnEditar.onclick = () => editarNome(item.numero);
-
-          const btnDisponibilizar = document.createElement("button");
-          btnDisponibilizar.innerText = "Disponibilizar ♻️";
-          btnDisponibilizar.className = "disponibilizar";
-          btnDisponibilizar.onclick = () => disponibilizarNumero(item.numero);
-
-          botoes.appendChild(btnPago);
-          botoes.appendChild(btnEditar);
-          botoes.appendChild(btnDisponibilizar);
+        function inicializarSistema() {
+            const qtd = parseInt(document.getElementById('quantidade').value);
+            if (!qtd || qtd <= 0) return alert("Quantidade inválida!");
+            
+            numeros = Array.from({length: qtd}, (_, i) => ({
+                numero: i + 1,
+                nome: "",
+                pago: false
+            }));
+            
+            database.ref('numeros').set(numeros);
+            database.ref('backup').set(numeros);
+            carregarDados();
         }
 
-        div.appendChild(info);
-        div.appendChild(botoes);
-        listaDiv.appendChild(div);
-      });
-    }
-  </script>
+        function carregarDados() {
+            database.ref('numeros').on('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    numeros = snapshot.val();
+                    atualizarLista();
+                }
+            });
+        }
+
+        function atualizarLista() {
+            const listaDiv = document.getElementById("listaNumeros");
+            listaDiv.innerHTML = "";
+
+            numeros.forEach(item => {
+                const div = document.createElement("div");
+                div.className = "item";
+
+                const info = document.createElement("div");
+                info.className = "info";
+                info.innerHTML = `
+                    Número ${item.numero}: 
+                    <span class="nome">${item.nome || "(disponível)"}</span>
+                    ${item.pago ? "✅" : ""}
+                `;
+
+                const botoes = document.createElement("div");
+                botoes.className = "botoes";
+
+                if (item.nome) {
+                    botoes.innerHTML = `
+                        <button class="pago" onclick="marcarPago(${item.numero})">
+                            ${item.pago ? 'Cancelar Pago' : 'Marcar Pago'}
+                        </button>
+                        <button class="editar" onclick="editar(${item.numero})">Editar</button>
+                        <button class="disponibilizar" onclick="disponibilizar(${item.numero})">Liberar</button>
+                    `;
+                }
+
+                div.appendChild(info);
+                div.appendChild(botoes);
+                listaDiv.appendChild(div);
+            });
+        }
+
+        function registrar() {
+            const numero = parseInt(document.getElementById('numero').value);
+            const nome = document.getElementById('nome').value.trim();
+            const index = numeros.findIndex(n => n.numero === numero);
+
+            if (index === -1 || !nome) return alert("Dados inválidos!");
+            if (numeros[index].nome) return alert("Número já cadastrado!");
+
+            numeros[index].nome = nome;
+            database.ref('numeros').set(numeros);
+            
+            document.getElementById('numero').value = '';
+            document.getElementById('nome').value = '';
+        }
+
+        function marcarPago(numero) {
+            const index = numeros.findIndex(n => n.numero === numero);
+            if (index === -1) return;
+            
+            numeros[index].pago = !numeros[index].pago;
+            database.ref('numeros').set(numeros);
+        }
+
+        function editar(numero) {
+            const index = numeros.findIndex(n => n.numero === numero);
+            if (index === -1) return;
+
+            const novoNome = prompt("Novo nome:", numeros[index].nome);
+            if (novoNome !== null) {
+                numeros[index].nome = novoNome.trim();
+                database.ref('numeros').set(numeros);
+            }
+        }
+
+        function disponibilizar(numero) {
+            const index = numeros.findIndex(n => n.numero === numero);
+            if (index === -1) return;
+
+            numeros[index].nome = "";
+            numeros[index].pago = false;
+            database.ref('numeros').set(numeros);
+        }
+
+        function disponibilizarTodos() {
+            if (!confirm("Confirmar disponibilização de todos?")) return;
+            
+            database.ref('backup').set(numeros);
+            numeros.forEach(n => {
+                n.nome = "";
+                n.pago = false;
+            });
+            database.ref('numeros').set(numeros);
+        }
+
+        function reverterDisponibilizacao() {
+            if (!confirm("Reverter última disponibilização?")) return;
+            
+            database.ref('backup').once('value').then(snapshot => {
+                if (snapshot.exists()) {
+                    numeros = snapshot.val();
+                    database.ref('numeros').set(numeros);
+                }
+            });
+        }
+
+        function gerarLista() {
+            const lista = numeros
+                .filter(n => n.nome)
+                .map(n => `${n.numero} - ${n.nome}${n.pago ? ' (PAGO)' : ''}`)
+                .join('\n');
+            
+            document.getElementById('listaWhatsApp').value = lista;
+        }
+
+        // Inicialização
+        carregarDados();
+    </script>
 </body>
 </html>
