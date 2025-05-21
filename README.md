@@ -14,8 +14,7 @@ Aplicação para gerenciar números em eventos de pega de boi, com registro em t
 - Tailwind CSS
 
 ## Como Executar
-1. Clone o repositório
-2. Substitua as credenciais do Firebase no arquivo `index.html`
-3. Abra o arquivo no navegador
+
+🔗 **Link para teste:** [GitHub Pages]([https://seu-usuario.github.io/repositorio/](https://aldo-ferreira.github.io/-Registros-de-Senhas-para-pega-de-boi-no-mato-/))
 
 ⚠️ **Nota**: Credenciais do Firebase são para fins de teste.
