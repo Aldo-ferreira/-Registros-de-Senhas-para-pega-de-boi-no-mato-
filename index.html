@@ -151,7 +151,6 @@
 
         #filtroStatus {
             padding: 6px 30px 6px 10px;
-            ;
             margin: 5px;
             border: 1px solid #cbd5e1;
             border-radius: 6px;
@@ -318,7 +317,7 @@
             <h3 class="text-lg text-gray-600">Cada número vale por um boi. Escolha seu Senha e registre o nome!</h3>
         </header>
         <div class="card">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4" .>Registrar a Senhas</h2>
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Registrar a Senhas</h2>
             <div class="form-group">
                 <label for="numero" class="text-gray-700 font-medium">Número:</label>
                 <input type="number" id="numero" placeholder="Digite o número"
@@ -413,9 +412,11 @@
         // Load initial data
         numerosRef.once('value').then((snapshot) => {
             if (snapshot.exists()) {
-                numeros = snapshot.val();
+                const data = snapshot.val();
+                // Convertendo objeto para array se necessário
+                numeros = Array.isArray(data) ? data : Object.values(data || {});
             } else {
-                // If no data exists, create initial list with 50 numbers
+                // Se não existir dados, criar array inicial com 50 números
                 numeros = Array.from({ length: 50 }, (_, i) => ({
                     numero: i + 1,
                     nome: '',
@@ -426,11 +427,12 @@
             atualizarTabela();
             initialLoadComplete = true;
 
-            // Só adicionar o listener depois da carga inicial
+            // Listener para mudanças em tempo real
             numerosRef.on('value', (snapshot) => {
                 if (initialLoadComplete && snapshot.exists()) {
-                    numeros = snapshot.val();
-                    filtrarTabela(); // Update UI when changes occur
+                    const data = snapshot.val();
+                    numeros = Array.isArray(data) ? data : Object.values(data || {});
+                    filtrarTabela();
                 }
             });
         }).catch(error => {
@@ -476,6 +478,11 @@
             }
 
             const index = numeros.findIndex(item => item.numero === numero);
+            if (index === -1) {
+                alert('Número inválido. Por favor, tente novamente.');
+                return;
+            }
+            
             if (numeros[index].nome) {
                 alert('Esse número já foi escolhido. Por favor, escolha outro.');
                 numeroInput.focus();
@@ -600,16 +607,21 @@
             }
 
             if (confirm(`Tem certeza que deseja alterar a quantidade para ${novaQuantidade} senhas? Esta ação pode remover números já registrados.`)) {
-                // Preservar os números existentes até o novo limite
-                const novaLista = Array.from({ length: novaQuantidade }, (_, i) => {
-                    const numero = i + 1;
-                    const existente = numeros.find(item => item.numero === numero);
-                    return existente || {
-                        numero: numero,
-                        nome: '',
-                        pago: false
-                    };
-                });
+                // Criar nova lista com a nova quantidade
+                const novaLista = [];
+                for (let i = 1; i <= novaQuantidade; i++) {
+                    // Verificar se já existe esse número na lista atual
+                    const existente = numeros.find(item => item.numero === i);
+                    if (existente) {
+                        novaLista.push(existente);
+                    } else {
+                        novaLista.push({
+                            numero: i,
+                            nome: '',
+                            pago: false
+                        });
+                    }
+                }
 
                 // Update list in Firebase
                 numerosRef.set(novaLista)
@@ -640,12 +652,6 @@
             const fragment = document.createDocumentFragment();
 
             let dadosFiltrados = numeros || [];
-
-            // Certifique-se de que numeros é um array
-            if (!Array.isArray(dadosFiltrados)) {
-                console.error("Dados não são um array:", dadosFiltrados);
-                dadosFiltrados = [];
-            }
 
             // Primeiro filtrar por status
             if (filtroStatus !== 'todos') {
