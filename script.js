@@ -196,32 +196,35 @@
   }
 
   // Atualizar quantidade de senhas
-  function atualizarQuantidadeSenhas() {
+function atualizarQuantidadeSenhas() {
     const novaQuantidade = parseInt(document.getElementById('quantidadeSenhas').value);
     if (!novaQuantidade || novaQuantidade < 1 || novaQuantidade > 1000) {
-      alert('Insira uma quantidade válida entre 1 e 1000.');
-      return;
+        alert('Insira uma quantidade válida entre 1 e 1000.');
+        return;
     }
 
     if (confirm(`Alterar a quantidade para ${novaQuantidade}? Números já registrados podem ser removidos.`)) {
-      const novaLista = [];
-      for (let i = 1; i <= novaQuantidade; i++) {
-        const existente = numeros.find(item => item.numero === i);
-        novaLista.push(existente || { numero: i, nome: '', pago: false });
-      }
-      numerosRef.set(novaLista)
-        .then(() => {
-          numeros = novaLista;
-          atualizarTabela();
-          alert(`Lista atualizada com ${novaQuantidade} senhas.`);
-          document.getElementById('quantidadeSenhas').value = '';
-        })
-        .catch(error => {
-          console.error("Erro ao atualizar quantidade:", error);
-          alert("Erro ao atualizar quantidade. Tente novamente.");
-        });
+        const novaLista = {};
+        for (let i = 1; i <= novaQuantidade; i++) {
+            const existente = numeros.find(item => item.numero === i);
+            novaLista[i] = existente || { numero: i, nome: '', pago: false };
+        }
+
+        numerosRef.set(novaLista)
+            .then(() => {
+                // Converter objeto para array local
+                numeros = Object.values(novaLista);
+                atualizarTabela();
+                alert(`Lista atualizada com ${novaQuantidade} senhas.`);
+                document.getElementById('quantidadeSenhas').value = '';
+            })
+            .catch(error => {
+                console.error("Erro ao atualizar quantidade:", error);
+                alert("Erro ao atualizar quantidade. Tente novamente.");
+            });
     }
-  }
+}
+
 
   // Filtrar tabela
   function filtrarTabela() {
